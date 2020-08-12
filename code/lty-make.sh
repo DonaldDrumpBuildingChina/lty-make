@@ -30,8 +30,13 @@ $only_compile=$4 # init only-compile flag
 $name=$5 # init object name
 
 for str in $targets; do # look at targets
+    echo "Running command: $compiler $str $flags \"/tmp/\"$str\".o\" $only_compile"
     $compiler $str $flags "/tmp/"$str".o" $only_compile # create temp object file
     if [ $? -ne 0 ]; then exit $?; fi
+    $objcets=$objects" /tmp/"$str".o"
 done
-$compiler $targets $flag $name # link them
+
+echo "Running command: $compiler $objects $flag $name"
+$compiler $objects $flag $name # link them
+echo "Well done. Outputed filename is $name."
 exit $?
