@@ -1,5 +1,11 @@
 #!/bin/bash
-function compile_dir(){
+function file_exist(){ # is file exist?
+    if [ -f $1 ]; then 
+        return 0
+    else
+        return 1
+}
+function compile_dir(){ # file must exist
     for file in `ls $1`; do
         if [ -d $1"/"$file ]; then
             echo "Going into dircetory: "$1"/"$file
@@ -19,8 +25,8 @@ function judge(){
         $flag=$cflag
     elif [ ${i##*.} == "cpp" ]; then # C++ language
         $2
-        $compiler=gcc
-        $flag=$cflag
+        $compiler=g++
+        $flag=$cxxflag
     # TODO: more languages
     else
         $3
@@ -30,6 +36,7 @@ echo 'Auto-Compile By Liu Tianyou'
 if [[ ($# -eq 3) && ($1 == "-auto") ]]; then # auto compile
     for i in $2; do
         echo "Compiling $i to object file..."
+        file_exist $i || { echo "Error: $i isn't exist!"; exit 1 }
         #code reuse
         judge "gcc $cflag $i -c -o /tmp/$i.obj || exit $?;" "g++ $cxxflag $i -c -o /tmp/$i.obj || exit $?" 'echo "Error: Cannot judge the type of $i. It means maybe cannot accept linking." >&2; exit 1'
         $objects=$objects" /tmp/"$i".obj" # add a object file to $objects
