@@ -20,7 +20,19 @@ function file_exist(){ # is file exist?
     else
         return 1
 }
-function compile_dir(){ # file must exist
+function new(){
+    if [ -f $1 ]; then 
+        touch $1
+        md5sum $2 >> $1
+        exit 1
+    fi
+    if [ `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]; then # is new?
+        md5sum $2 >> $1
+        exit 1
+    else
+        exit 0
+}
+function compile_dir(){
     for file in `$5`; do
         if [ -d $1"/"$file ]; then
             if [ $4 == "y" ]; then
@@ -29,8 +41,7 @@ function compile_dir(){ # file must exist
                 echo "Leaving into dircetory: "$1"/"$file
             fi
         else
-            echo "Compiling $i to object file..."
-            #code reuse
+            echo "Compiling $i ..."
             judge "gcc $cflag $file -c -o $2/${file%.*} || exit $?" "g++ $cxxflag $file -c -o $2/${file%.*} || exit $?" 'echo "Warning: Cannot judge the type of $file." >&2'
         fi
     done
@@ -54,7 +65,15 @@ if [[ ($# -eq 3) && ($1 == "auto") ]]; then # auto compile
     for i in $2; do
         echo "Compiling $i to object file..."
         file_exist $i || { echo "Error: $i isn't exist!"; exit 1 }
-        #code reuse
+        if new md5sum.txt $i; then
+            if file_exist /tmp/$i.obj; then
+                echo "$i is newest. Skiping..."
+                $objects=$objects" /tmp/"$i".obj" # add a object file to $objects
+                continue
+            else
+                echo "/tmp/$i.obj is not exist. Compiling..."
+            fi
+        fi
         judge "gcc $cflag $i -c -o /tmp/$i.obj || exit $?;" "g++ $cxxflag $i -c -o /tmp/$i.obj || exit $?" 'echo "Error: Cannot judge the type of $i. It means maybe cannot accept linking." >&2; exit 1'
         $objects=$objects" /tmp/"$i".obj" # add a object file to $objects
     done
