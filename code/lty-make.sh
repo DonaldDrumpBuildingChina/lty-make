@@ -38,7 +38,7 @@ if [[ ($# -eq 3) && ($1 == "-auto") ]]; then # auto compile
     $compiler $flag $objects -o $3 || exit $? # link
     echo "done."
 elif [[ ($# -eq 3) && ($1 == "-dir-compile") ]]; then
-    compile_dir $2 $3
+    compile_dir $2 $3 || exit 1
 elif [[ ($# -eq 2) && ($1 == "-install") ]]; then # install package
     if command -v apt > /dev/null 2>&1; then
         apt install $2 -y || exit $?
