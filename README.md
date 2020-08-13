@@ -8,7 +8,13 @@ lty-make.sh -auto "main.cpp hello.cpp" "../hello.out"
 
 如果你有一个文件夹的单文件项目，试试这个：
 ```
-lty-make -dir-compile "code" "../" 
+lty-make -dir-compile "code" "../"
+```
+
+你甚至可以规定到正则表达式和是否递归！试试这个：
+```
+lty-make -dir-compile "code" "../" -r
+lty-make -dir-compile "code" "../" '-advance=正则表达式（不会写）'
 ```
 
 要使用老式编译，使用这个：
