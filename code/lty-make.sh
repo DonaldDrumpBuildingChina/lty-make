@@ -50,7 +50,7 @@ function judge(){
     fi
 }
 echo 'Auto-Compile By Liu Tianyou'
-if [[ ($# -eq 3) && ($1 == "-auto") ]]; then # auto compile
+if [[ ($# -eq 3) && ($1 == "auto") ]]; then # auto compile
     for i in $2; do
         echo "Compiling $i to object file..."
         file_exist $i || { echo "Error: $i isn't exist!"; exit 1 }
@@ -61,21 +61,21 @@ if [[ ($# -eq 3) && ($1 == "-auto") ]]; then # auto compile
     echo "Linking everthing together..."
     $compiler $flag $objects -o $3 || exit $? # link
     echo "done."
-elif [[ ($# -eq 3) && ($1 == "-dir-compile") ]]; then
+elif [[ ($# -eq 3) && ($1 == "dir") ]]; then
     compile_dir $2 $3 "n" 'ls $1' || exit 1
-elif [[ ($# -eq 4) && ($1 == "-dir-compile") && ($4 == "-r") ]]; then
+elif [[ ($# -eq 4) && ($1 == "dir") && ($4 == "-r") ]]; then
     compile_dir $2 $3 "y" 'ls $1' || exit 1
-elif [[ ($# -eq 4) && ($1 == "-dir-compile") && (${$4%=*} == "-advance") ]]; then
+elif [[ ($# -eq 4) && ($1 == "dir") && (${$4%=*} == "-advance") ]]; then
     compile_dir $2 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
-elif [[ ($# -eq 5) && ($1 == "-dir-compile") ]]; then
+elif [[ ($# -eq 5) && ($1 == "dir") ]]; then
     compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
-elif [[ ($# -eq 2) && ($1 == "-install") ]]; then # install package
+elif [[ ($# -eq 2) && ($1 == "install") ]]; then # install package
     if command -v apt > /dev/null 2>&1; then
         apt install $2 -y || exit $?
     else
         yum install $2 -y || exit $?
     fi
-elif [[ ($# -eq 7) && ($1 == "-compiler") ]]; then
+elif [[ ($# -eq 7) && ($1 == "compiler") ]]; then
     for i in $2; do
         echo "Compiling $i to object file..." # compile
         $2 $3 $6 $5 $i /tmp/$i.obj || exit $?
