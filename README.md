@@ -1,15 +1,26 @@
 # Auto-Compile By Liu Tianyou
 
-For example, $0 -auto "main.cpp hello.cpp" "../hello.out"
+一般来说，想要编译一个（单/多文件）项目，只需要运行以下的命令行：
+```
+lty-make.sh -auto "main.cpp hello.cpp" "../hello.out"
+```
+判断项目类型（C或C++）是以最后一个项目的后缀名为准。
 
-Or try this, $0 -dir-compile "code" "../" 
+如果你有一个文件夹的单文件项目，试试这个：
+```
+lty-make -dir-compile "code" "../" 
+```
 
-If you want chooice a compiler, try this, $0 -compiler "g++" "-p -g -O3" "main.cpp hello.cpp" "-o"(output flag) "-c"(only compile flag) "../hello.out"
+要使用老式编译，使用这个：
+```
+lty-make -compiler "g++" "-p -g -O3" "main.cpp hello.cpp" "-o"(output flag) "-c"(only compile flag) "../hello.out"
+```
 
-If you want to install compiler, use $0 -install "g++"
+如果你想安装编译器，试试这个：
+```
+lty-make -install "g++"
+```
 
-If you want to chooise flags, you need to change env $cflag $cxxflag (TODO: more languages)
+想要修改自动编译的命令行，你需要改变环境变量$cflag和$cxxflag的值。
 
-If compile error, script will exit.
-
-So if you get a error, please send a e-mail to my email [1347277058@qq.com](mailto://1347277058@qq.com).
+欢迎提交工单/推送请求。
