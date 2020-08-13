@@ -14,15 +14,16 @@
 #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-mkdir /lty-make
-mkdir /lty-make/download
-mkdir /lty-make/package
+mkdir /lty-make 2> /dev/null
+mkdir /lty-make/download 2> /dev/null
+mkdir /lty-make/package 2> /dev/null
 
 function file_exist(){ # is file exist?
     if [ -f $1 ]; then 
         return 0
     else
         return 1
+    fi
 }
 function new(){
     if [ -f $1 ]; then 
@@ -35,6 +36,7 @@ function new(){
         exit 1
     else
         exit 0
+    fi
 }
 function compile_dir(){
     for file in `$5`; do
@@ -63,7 +65,7 @@ function judge(){
         $3
         $compiler=gpc
         $flag=$pasflag
-    elif [[ (${i##*.} == "f90") || (${i##*.} == "f95") || (${i##*.} == "f") || (${i##*.} == "for") || ]]; then # C++ language
+    elif [[ (${i##*.} == "f90") || (${i##*.} == "f95") || (${i##*.} == "f") || (${i##*.} == "for") ]]; then # C++ language
         $4
         $compiler=gfortran
         $flag=$forflag
@@ -85,8 +87,8 @@ if [[ ($# -eq 3) && ($1 == "auto") ]]; then # auto compile
                 echo "/lty-make/objects/$i.obj is not exist. Compiling..."
             fi
         fi
-        judge "gcc $cflag $i -c -o /tmp/$i.obj || exit 1;" "g++ $cxxflag $i -c -o /tmp/$i.obj || exit 1" "gpc $pasflag $i -c -o /tmp/$i.obj || exit 1" "gfortran $forflag $i -c -o /tmp/$i.obj || exit 1" 'echo "Error: Cannot judge the type of $i. It means maybe cannot accept linking." >&2; exit 1'
-        $objects=$objects" /lty-make/objects/"$i".obj" # add a object file to $objects
+        judge "gcc $cflag $i -c -o /tmp/$i.obj || exit 1;" "g++ $cxxflag $i -c -o /tmp/$i.obj || exit 1" "gpc $pasflag $i -c -o /tmp/$i.obj || exit 1" "gfortran $forflag $i -c -o /tmp/$i.obj || exit 1" "echo Error: Cannot judge the type of $i. >&2; exit 1"
+        $objects="$objects /lty-make/objects/$i.obj"
     done
     echo "Linking everthing together..."
     $compiler $flag $objects -o $3 || exit $? # link
