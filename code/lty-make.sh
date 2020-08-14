@@ -20,26 +20,18 @@ mkdir /lty-make/download 2> /dev/null
 mkdir /lty-make/package 2> /dev/null
 
 function new(){
-    if [ ! -f $1 ]; then # no file
-        touch $1 # create it
+    if [[ ! -f $1 || `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]]; then
+        touch $1 2> /dev/null # create it
         md5sum $2 >> $1 # write down
         exit 1
-    fi
-    if [ `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]; then # Is new file's md5sum == history md5sum?
-        md5sum $2 >> $1 # write down
-        exit 1
-    else
-        exit 0
     fi
 }
 function compile_dir(){
     for file in `$5`; do # $5 is "ls -al" etc.
-        if [ -d $1"/"$file ]; then
-            if [ $4 == "y" ]; then # -f option on
-                echo "Entering into dircetory: "$1"/"$file
-                compile_dir $1"/"$file $2 $4 $5 # recurrence
-                echo "Leaving into dircetory: "$1"/"$file
-            fi
+        if [[ -d $1"/"$file && $4 == "y" ]]; then
+            echo "Entering into dircetory: "$1"/"$file
+            compile_dir $1"/"$file $2 $4 $5 # recurrence
+            echo "Leaving into dircetory: "$1"/"$file
         else
             echo "Compiling $i ..."
             judge "gcc $cflag $file -c -o $2/${file%.*}" "g++ $cxxflag $file -c -o $2/${file%.*}" "gpc $pasflag $i -c -o /tmp/$i.obj" "gfortran $forflag $i -c -o /tmp/$i.obj" 'echo "Warning: Cannot judge the type of $file." >&2'
