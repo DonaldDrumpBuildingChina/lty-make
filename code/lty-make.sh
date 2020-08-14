@@ -53,24 +53,26 @@ function compile_dir(){
     done
 } 
 function judge(){
+    # Caution: echo "xxx" | bash can select a pid and fork it.
+    # So, Can not edit vars.
     if [ ${i##*.} == "c" ]; then # judge file type, ${i##*.} means suffix name. (C language)
-        $1
+        echo $1 | bash
         $compiler=gcc
         $flag=$cflag
     elif [ ${i##*.} == "cpp" ]; then # C++ language
-        $2
+        echo $2 | bash
         $compiler=g++
         $flag=$cxxflag
     elif [ ${i##*.} == "pas" ]; then # Pascal language
-        $3
+        echo $3 | bash
         $compiler=gpc
         $flag=$pasflag
     elif [[ (${i##*.} == "f90") || (${i##*.} == "f95") || (${i##*.} == "f") || (${i##*.} == "for") ]]; then # Fortran language
-        $4
+        echo $4 | bash
         $compiler=gfortran
         $flag=$forflag
     else
-        $5
+        echo $5 | bash
     fi
 }
 echo 'Auto-Compile By Liu Tianyou'
@@ -108,7 +110,6 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
             cd m4 # /lty-make/download/m4
                 ./configure --prefix=/lty-make/package/m4
                 make && make install 
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/m4/libs"
                 ln -s /usr/bin/m4 /ltymake/package/m4/bin/m4
         cd ..
             wget -O /lty-make/download/gmp.tar.zst http://mirrors.kernel.org/gnu/gmp/gmp-6.2.0.tar.zst
@@ -116,7 +117,6 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
             cd gmp # /lty-make/download/gmp
                 ./configure --prefix=/lty-make/package/gmp
                 make && make install
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/gmp/libs"
                 ln -s /usr/bin/gmp /ltymake/package/gmp/bin/gmp
         cd ..
             wget -O /lty-make/download/mpfr.tar.gz http://mirrors.kernel.org/gnu/mpfr/mpfr-4.1.0.tar.gz
@@ -124,7 +124,6 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
             cd mpfr # /lty-make/download/mpfr
                 ./configure --prefix=/lty-make/package/mpfr --with-gmp=/lty-make/package/gmp
                 make && make install
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/mpfr/libs"
                 ln -s /usr/bin/mpfr /ltymake/package/mpfr/bin/mpfr
         cd ..
             wget -O /lty-make/download/mpc.tar.gz http://mirrors.kernel.org/gnu/mpc/mpc-1.0.1.tar.gz
@@ -132,17 +131,15 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
             cd mpc # /lty-make/download/mpc
                 ./configure --prefix=/lty-make/package/mpc --with-gmp=/lty-make/package/gmp
                 make && make install
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/mpc/libs"
                 ln -s /usr/bin/mpc /ltymake/package/mpc/bin/mpc
         cd ..
-    elif [[ $2 == "C" || $2 == "C++" || $2 == "gcc" || $2 == "Pascal" || $2 == "Fortran" ]]; then
+    elif [[ $2 == "c" || $2 == "c++" || $2 == "gcc" || $2 == "pascal" || $2 == "fortran" ]]; then
         cd /lty-make/download
             wget -O /lty-make/download/gcc.tar.gz http://mirrors.kernel.org/gnu/gcc/gcc-9.3.0/gcc-9.3.0.tar.gz
             tar -xzvf /lty-make/download/gcc.tar.gz /lty-make/download/gcc
             cd gcc # /lty-make/download/gcc
                 ./configure --prefix=/lty-make/package/gcc --enable-languages=c,fortran,pascal
                 make && make install
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/gcc/libs"
                 ln -s /usr/bin/gcc /ltymake/package/gcc/bin/gcc
                 ln -s /usr/bin/g++ /ltymake/package/gcc/bin/g++
                 ln -s /usr/bin/gfortran /ltymake/package/gcc/bin/gfortran
@@ -155,7 +152,6 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
             cd make # /lty-make/download/make
                 ./configure --prefix=/lty-make/package/make
                 make && make install
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/make/libs"
                 ln -s /usr/bin/make /ltymake/package/make/bin/make
         cd ..
     elif [ $2 == "git" ]; then
@@ -165,7 +161,6 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
             cd git # /lty-make/download/git
                 ./configure --prefix=/lty-make/package/git
                 make && make install
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/git/libs"
                 ln -s /usr/bin/git /ltymake/package/git/bin/git
         cd ..
     elif [ $2 == "bash" ]; then
@@ -175,11 +170,37 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
             cd bash # /lty-make/download/bash
                 ./configure --prefix=/lty-make/package/bash
                 make && make install
-                $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/bash/libs"
                 ln -s /usr/bin/bash /ltymake/package/bash/bin/bash
+        cd ..
+    elif [ $2 == "python" ]; then
+        cd /lty-make/download
+            wget -O /lty-make/download/python.tar.gz https://www.python.org/ftp/python/3.9.0/Python-3.9.0rc1.tgz
+            tar -xzvf /lty-make/download/python.tar.gz /lty-make/download/python
+            cd python # /lty-make/download/python
+                ./configure --prefix=/lty-make/package/python
+                make && make install
+                ln -s /lty-make/package/python/bin/python3 /usr/bin/python3
+                ln -s /lty-make/package/python/bin/pip3 /usr/bin/pip3
         cd ..
     fi
     rm -rf /lty-make/download
+elif [[ $# -eq 2 && $1 == "remove" ]]; then # install package
+    if [ $2 == "require" ]; then
+        rm -rf /lty-make/package/m4 /usr/bin/m4
+        rm -rf /lty-make/package/m4 /usr/bin/gmp
+        rm -rf /lty-make/package/m4 /usr/bin/mpfr
+        rm -rf /lty-make/package/m4 /usr/bin/mpc
+    elif [[ $2 == "c" || $2 == "c++" || $2 == "gcc" || $2 == "pascal" || $2 == "fortran" ]]; then
+        rm -rf /lty-make/package/gcc /usr/bin/gcc
+    elif [ $2 == "make" ]; then
+        rm -rf /lty-make/package/make /usr/bin/make
+    elif [ $2 == "git" ]; then
+        rm -rf /lty-make/package/git /usr/bin/git
+    elif [ $2 == "bash" ]; then
+        rm -rf /lty-make/package/bash /usr/bin/bash
+    elif [ $2 == "python" ]; then
+        rm -rf  /lty-make/package/python /usr/bin/python3 /usr/bin/pip3
+    fi
 elif [[ $# -eq 7 && $1 == "compiler" ]]; then # old compile
     for i in $2; do
         echo "Compiling $i to object file..." # compile 
