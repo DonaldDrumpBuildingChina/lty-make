@@ -1,18 +1,42 @@
 #!/bin/bash
 
-#           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-#                   Version 2, December 2004
-#
-# Copyright (C) 2012 Romain Lespinasse <romain.lespinasse@gmail.com>
-#
-# Everyone is permitted to copy and distribute verbatim or modified
-# copies of this license document, and changing it is allowed as long
-# as the name is changed.
-#
-#            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-#   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-#
-#  0. You just DO WHAT THE FUCK YOU WANT TO.
+######################################################################
+#           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE              #
+#                   Version 2, December 2004                         #
+#                                                                    #
+# Copyright (C) 2012 Romain Lespinasse <romain.lespinasse@gmail.com> #
+#                                                                    #
+# Everyone is permitted to copy and distribute verbatim or modified  #
+# copies of this license document, and changing it is allowed as long#
+# as the name is changed.                                            #
+#                                                                    #
+#            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE             #
+#   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION  #
+#                                                                    #
+#  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
+######################################################################
+
+################################################
+#               Open Source Mind               #
+#                                              #
+#   For water the code, I want to say something#
+# about open source mind there.                #
+#                                              #
+# I think, the true "Open Source Mind" is NO a-#
+# ny astrist for the code by self. Some license#
+# is good example. How about "DO WHAT THE FUCK #
+# YOU WANT TO PUBLIC LICENSE"? I think it's g- #
+# ood. But "GPL LICENSE" is not UNACCEPTABLE.  #
+#                                              #
+#   However, I think we need open our source.  #
+# Close Source would stifle innovation and I   #
+# don't want to let world to be this.          #
+#                                              #
+#   We need Open Source! It can change the h-  #
+# istoy of human!                              #
+#                                 Liu Tianyou  #
+#                             2020/8/14 18:15  #
+################################################
 
 # make some folders
 mkdir /lty-make 2> /dev/null
