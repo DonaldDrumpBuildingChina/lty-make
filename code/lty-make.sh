@@ -19,6 +19,7 @@ mkdir /lty-make 2> /dev/null
 mkdir /lty-make/download 2> /dev/null
 mkdir /lty-make/package 2> /dev/null
 
+# Is it new file?
 function new(){
     if [[ ! -f $1 || `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]]; then
         touch $1 2> /dev/null # create it
@@ -26,6 +27,8 @@ function new(){
         exit 1
     fi
 }
+
+# Compile all folder
 function compile_dir(){
     for file in `$5`; do # $5 is "ls -al" etc.
         if [[ -d $1"/"$file && $4 == "y" ]]; then
@@ -34,10 +37,17 @@ function compile_dir(){
             echo "Leaving into dircetory: "$1"/"$file
         else
             echo "Compiling $i ..."
-            judge "gcc $cflag $file -c -o $2/${file%.*}" "g++ $cxxflag $file -c -o $2/${file%.*}" "gpc $pasflag $i -c -o /tmp/$i.obj" "gfortran $forflag $i -c -o /tmp/$i.obj" 'echo "Warning: Cannot judge the type of $file." >&2'
+            judge "gcc $cflag $file -c -o $2/${file%.*}" \ # use gcc to compile C source code
+            "g++ $cxxflag $file -c -o $2/${file%.*}" \ # use g++ to compile C++ source code
+            "gpc $pasflag $i -c -o /tmp/$i.obj" \ # use gpc (GNU Pascal Compiler) to compile Pascal source code
+            "gfortran $forflag $i -c -o /tmp/$i.obj" \ # use gfortran to compile Fortran source code
+            "gcj $javaflag $i -c -o /tmp/$i.obj || exit 1" \ # use gcj to compile java source code
+            'echo "Warning: Cannot judge the type of $file." >&2' # cannot understand the suffix name
         fi
     done
 } 
+
+# Compile signal file and it is universally
 function judge(){
     # Caution: echo "xxx" | bash can select a pid and fork it.
     # So, Can not edit vars.
@@ -57,11 +67,17 @@ function judge(){
         echo $4 | bash
         $compiler=gfortran
         $flag=$forflag
-    else
+    elif [[ ${i##*.} == "java" ]]; then # Java language
         echo $5 | bash
+        $compiler=gcj
+        $flag=$javaflag
+    else
+        echo $6 | bash
     fi
 }
+
 echo 'Auto-Compile By Liu Tianyou'
+# Let's see the command lines!
 if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
     for i in $2; do
         echo "Compiling $i to object file..."
@@ -75,7 +91,12 @@ if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
                 echo "/lty-make/objects/$i.obj is not exist. Compiling..."
             fi
         fi
-        judge "gcc $cflag $i -c -o /tmp/$i.obj || exit 1;" "g++ $cxxflag $i -c -o /tmp/$i.obj || exit 1" "gpc $pasflag $i -c -o /tmp/$i.obj || exit 1" "gfortran $forflag $i -c -o /tmp/$i.obj || exit 1" "echo Error: Cannot judge the type of $i. >&2; exit 1"
+        judge "gcc $cflag $i -c -o /tmp/$i.obj || exit 1;" \ # use gcc to compile C source code
+        "g++ $cxxflag $i -c -o /tmp/$i.obj || exit 1" \ # use g++ to compile C++ source code
+        "gpc $pasflag $i -c -o /tmp/$i.obj || exit 1" \ # use gpc (GNU Pascal Compiler) to compile Pascal source code
+        "gfortran $forflag $i -c -o /tmp/$i.obj || exit 1" \ # use gfortran to compile Fortran source code
+        "gcj $javaflag $i -c -o /tmp/$i.obj || exit 1" \ # use gcj to compile java source code
+        "echo Error: Cannot judge the type of $i. >&2; exit 1" # cannot understand the suffix name
         $objects="$objects /lty-make/objects/$i.obj"
     done
     echo "Linking everthing together..."
@@ -89,237 +110,344 @@ elif [[ $# -eq 4 && $1 == "dir" && (${$4%=*} == "-advance") ]]; then # -advance 
 elif [[ $# -eq 5 && $1 == "dir" ]]; then # all on
     compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
 elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
+    cd /lty-make/download 
     if [[ $2 == "require" ]]; then
-        cd /lty-make/download
+        # Compiling package m4
+            # get source code online
             wget -O /lty-make/download/m4.tar.gz http://mirrors.kernel.org/gnu/m4/m4-latest.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/m4.tar.gz /lty-make/download/m4
             cd m4 # /lty-make/download/m4
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/m4
+                # make it
                 make && make install 
+                # create soft linker
                 ln -s /usr/bin/m4 /lty-make/package/m4/bin/m4
+        # Compiling package gmp
         cd ..
+            # get source code online
             wget -O /lty-make/download/gmp.tar.zst http://mirrors.kernel.org/gnu/gmp/gmp-6.2.0.tar.zst
+            # tar it
             tar -I zstd -xvf gmp.tar.zst /lty-make/doenload/gmp
             cd gmp # /lty-make/download/gmp
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/gmp
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/gmp /lty-make/package/gmp/bin/gmp
+        # Compiling package mpfr
         cd ..
+            # get source code online
             wget -O /lty-make/download/mpfr.tar.gz http://mirrors.kernel.org/gnu/mpfr/mpfr-4.1.0.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/mpfr.tar.gz /lty-make/download/mpfr
             cd mpfr # /lty-make/download/mpfr
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/mpfr --with-gmp=/lty-make/package/gmp
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/mpfr /lty-make/package/mpfr/bin/mpfr
+        # Compiling package mpc
         cd ..
+            # get source code online
             wget -O /lty-make/download/mpc.tar.gz http://mirrors.kernel.org/gnu/mpc/mpc-1.0.1.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/mpc.tar.gz /lty-make/download/mpc
             cd mpc # /lty-make/download/mpc
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/mpc --with-gmp=/lty-make/package/gmp
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/mpc /lty-make/package/mpc/bin/mpc
+        # Compiling package apr
         cd ..
+            # get source code online
             wget -O /lty-make/download/apr.tar.gz http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/apr.tar.gz /lty-make/download/apr
             cd apr # /lty-make/download/apr
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/apr
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/apr /lty-make/package/apr/bin/apr
+        # Compiling package apr-utill
         cd ..
+            # get source code online
             wget -O /lty-make/download/apr-utill.tar.gz http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/apr-utill.tar.gz /lty-make/download/apr-utill
             cd apr-utill # /lty-make/download/apr-utill
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/apr-utill
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/apr-utill /lty-make/package/apr/bin/apr-utill
+        # Compiling package pcre
         cd ..
-            wget -O /lty-make/download/pcre.zip http://jaist.dl.sourceforge.net/project/pcre/pcre/8.10/pcre-8.10.zip  
+            # get source code online
+            wget -O /lty-make/download/pcre.zip http://jaist.dl.sourceforge.net/project/pcre/pcre/8.10/pcre-8.10.zip 
+            # unzip it 
             unzip /lty-make/download/pcre.zip -d /lty-make/download/pcre
             cd pcre # /lty-make/download/pcre
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/pcre
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/pcre /lty-make/package/apr/bin/pcre
+        # Compiling package boost
         cd ..
+            # get source code online
             wget -O /lty-make/download/boost.tar.gz http://www.sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz
+            # tar it 
             tar -xzvf /lty-make/download/boost.tar.gz /lty-make/download/boost
             cd boost # /lty-make/download/boost
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/boost
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/boost /lty-make/package/apr/bin/boost
         cd ..
+    elif [[ $2 == "mysql" ]]; then # Compiling package mysql
+            # get source code online
             wget -O /lty-make/download/mysql.tar.gz https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.24.tar.gz
+            # tar it 
             tar -xzvf /lty-make/download/mysql.tar.gz /lty-make/download/mysql
             cd mysql # /lty-make/download/mysql
-                cmake -DCMAKE_INSTALL_PREFIX=/lty-make/package/mysql \
-                    -DWITH_BOOST=/lty-make/package/boost \
-                    -DMYSQL_UNIX_ADDR=/lty-make/package/mysql/tmp/mysql.sock \
-                    -DMYSQL_DATADIR=/lty-make/package/mysql/data \
-                    -DDEFAULT_CHARSET=utf8mb4 \
-                    -DDEFAULT_COLLATION=utf8mb4_general_ci \
-                    -DWITH_EXTRA_CHARSETS=all \
-                    -DWITH_MYISAM_STORAGE_ENGINE=1 \
-                    -DWITH_INNOBASE_STORAGE_ENGINE=1 \
-                    -DWITH_MEMORY_STORAGE_ENGINE=1 \
-                    -DWITH_READLINE=1 \
-                    -DWITH_INNODB_MEMCACHED=1 \
-                    -DWITH_DEBUG=OFF \
-                    -DWITH_ZLIB=bundled \
-                    -DENABLED_LOCAL_INFILE=1 \
-                    -DENABLED_PROFILING=ON \
-                    -DMYSQL_MAINTAINER_MODE=OFF \
-                    -DMYSQL_TCP_PORT=3306
+                # configure it and create Makefile
+                cmake -DCMAKE_INSTALL_PREFIX=/lty-make/package/mysql \ # install directory
+                    -DWITH_BOOST=/lty-make/package/boost \ # with boost library
+                    -DMYSQL_UNIX_ADDR=/lty-make/package/mysql/tmp/mysql.sock \ # socket file
+                    -DMYSQL_DATADIR=/lty-make/package/mysql/data \ # data directory
+                    -DDEFAULT_CHARSET=utf8mb4 \ # charset
+                    -DDEFAULT_COLLATION=utf8mb4_general_ci \ # collation
+                    -DWITH_EXTRA_CHARSETS=all \ # with all charsets
+                    -DWITH_MYISAM_STORAGE_ENGINE=1 \ # with myisam storage engine
+                    -DWITH_INNOBASE_STORAGE_ENGINE=1 \ # with innobase storage engine
+                    -DWITH_MEMORY_STORAGE_ENGINE=1 \ # with memory storage engine
+                    -DWITH_READLINE=1 \ # readline
+                    -DWITH_INNODB_MEMCACHED=1 \ # memcached
+                    -DWITH_DEBUG=OFF \ # debug off
+                    -DWITH_ZLIB=bundled \ # zlib
+                    -DENABLED_LOCAL_INFILE=1 \ # enable local infile
+                    -DENABLED_PROFILING=ON \ # enable progiling
+                    -DMYSQL_MAINTAINER_MODE=OFF \ # off maintainer mode
+                    -DMYSQL_TCP_PORT=3306 # port
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/mysql /lty-make/package/mysql/bin/mysql
         cd ..
+    elif [[ $2 == "php" ]]; then # Compiling package php
+        # get source code online
         wget -O /lty-make/download/php.tar.gz http://php.net/distributions/php-7.4.0.tar.gz
+            # tar it 
             tar -xzvf /lty-make/download/php.tar.gz /lty-make/download/php
             cd php # /lty-make/download/php
+                # add php user group
                 groupadd php
+                # add php user to php group
                 useradd -g php php
+                # configure it and create Makefile
                 ./configure \ 
-                    --prefix=/lty-make/package/php \ 
-                    --with-config-file-path=/etc \ 
-                    --with-fpm-user=php \ 
-                    --with-fpm-group=php \  
-                    --with-curl \ 
-                    --with-freetype-dir \ 
-                    --enable-gd \ 
-                    --with-gettext \  
-                    --with-iconv-dir \ 
-                    --with-kerberos \ 
-                    --with-libdir=lib64 \ 
-                    --with-libxml-dir \ 
-                    --with-mysqli \ 
-                    --with-openssl \ 
-                    --with-pcre-regex \ 
-                    --with-pdo-mysql \ 
-                    --with-pdo-sqlite \ 
-                    --with-pear \ 
-                    --with-png-dir \ 
-                    --with-jpeg-dir \ 
-                    --with-xmlrpc \ 
-                    --with-xsl \ 
-                    --with-zlib \ 
-                    --with-bz2 \ 
-                    --with-mhash \ 
-                    --enable-fpm \ 
-                    --enable-bcmath \ 
-                    --enable-libxml \ 
-                    --enable-inline-optimization \ 
-                    --enable-mbregex \ 
-                    --enable-mbstring \ 
-                    --enable-opcache \ 
-                    --enable-pcntl \ 
-                    --enable-shmop \ 
-                    --enable-soap \ 
-                    --enable-sockets \ 
-                    --enable-sysvsem \ 
-                    --enable-sysvshm \ 
-                    --enable-xml \  
-                    --enable-zip \ 
-                    --enable-fpm
+                    --prefix=/lty-make/package/php \ # install directory
+                    --with-config-file-path=/lty-make/package/php/config \ # config file path
+                    --with-fpm-user=php \ # php user
+                    --with-fpm-group=php \ # php group
+                    --with-curl \ # curl module
+                    --with-freetype-dir \ # free-type dir module
+                    --enable-gd \ # gd module
+                    --with-gettext \  # get-text module
+                    --with-iconv-dir \ # iconv-dir module
+                    --with-kerberos \ # kerberos module
+                    --with-libdir=lib64 \ # x64 lib
+                    --with-libxml-dir \ # libxml-dir module
+                    --with-mysqli \ # mysqli module
+                    --with-openssl \ # openssl module
+                    --with-pcre-regex \ # pcre-regex module
+                    --with-pdo-mysql \ # pdo-mysql module
+                    --with-pdo-sqlite \ # pdo-sqlite module
+                    --with-pear \ # pear module
+                    --with-png-dir \ # png-dir module
+                    --with-jpeg-dir \ # jpeg-dir module
+                    --with-xmlrpc \ # xmlrpc module
+                    --with-xsl \ #xsl module
+                    --with-zlib \ # zlib 
+                    --with-bz2 \ # bz2
+                    --with-mhash \ # mhash module
+                    --enable-fpm \ # php-fpm
+                    --enable-bcmath \ # bcmath module
+                    --enable-libxml \ # libxml module
+                    --enable-inline-optimization \ # inline-optimization module
+                    --enable-mbregex \ # mbregex module
+                    --enable-mbstring \ # mbstring
+                    --enable-opcache \ # opcache module
+                    --enable-pcntl \ # pcntl module
+                    --enable-shmop \ # shmop module
+                    --enable-soap \ # soap module
+                    --enable-sockets \ # sockets module
+                    --enable-sysvsem \ # sysvsem module
+                    --enable-xml \ # xml module
+                    --enable-zip # zip module
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/php-fpm /lty-make/package/php/bin/php-fpm
+                # start service
                 service php-fpm start
         cd ..
-    elif [[ $2 == "c" || $2 == "c++" || $2 == "gcc" || $2 == "pascal" || $2 == "fortran" ]]; then
+    elif [[ $2 == "c" || $2 == "c++" || $2 == "gcc" || $2 == "pascal" || $2 == "fortran" ]]; then # Compiling package gcc
         cd /lty-make/download
+            # get source code online
             wget -O /lty-make/download/gcc.tar.gz http://mirrors.kernel.org/gnu/gcc/gcc-9.3.0/gcc-9.3.0.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/gcc.tar.gz /lty-make/download/gcc
             cd gcc # /lty-make/download/gcc
-                ./configure --prefix=/lty-make/package/gcc --enable-languages=c,fortran,pascal
+                # configure it and create Makefile
+                ./configure --prefix=/lty-make/package/gcc --enable-languages=c,c++,objc,java,fortran,pascal
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/gcc /lty-make/package/gcc/bin/gcc
                 ln -s /usr/bin/g++ /lty-make/package/gcc/bin/g++
                 ln -s /usr/bin/gfortran /lty-make/package/gcc/bin/gfortran
                 ln -s /usr/bin/gpc /lty-make/package/gcc/bin/gpc
         cd ..
-    elif [[ $2 == "make" ]]; then
+    elif [[ $2 == "make" ]]; then # Compiling package make
         cd /lty-make/download
+            # get source code online
             wget -O /lty-make/download/make.tar.gz http://mirrors.kernel.org/gnu/make/make-4.3.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/make.tar.gz /lty-make/download/make
             cd make # /lty-make/download/make
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/make
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/make /lty-make/package/make/bin/make
         cd ..
-    elif [[ $2 == "git" ]]; then
+    elif [[ $2 == "git" ]]; then # Compiling package git
         cd /lty-make/download
+            # get source code online
             wget -O /lty-make/download/git.tar.gz http://mirrors.kernel.org/gnu/git/gnuit-4.9.5.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/git.tar.gz /lty-make/download/git
             cd git # /lty-make/download/git
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/git
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/git /lty-make/package/git/bin/git
         cd ..
-    elif [[ $2 == "bash" ]]; then
+    elif [[ $2 == "bash" ]]; then # Compiling package bash
         cd /lty-make/download
+            # get source code online
             wget -O /lty-make/download/bash.tar.gz http://mirrors.kernel.org/gnu/bash/bash-5.0.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/bash.tar.gz /lty-make/download/bash
             cd bash # /lty-make/download/bash
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/bash
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /usr/bin/bash /lty-make/package/bash/bin/bash
         cd ..
-    elif [[ $2 == "python" ]]; then
+    elif [[ $2 == "python" ]]; then # Compiling package python
         cd /lty-make/download
+            # get source code online
             wget -O /lty-make/download/python.tar.gz https://www.python.org/ftp/python/3.9.0/Python-3.9.0rc1.tgz
+            # tar it
             tar -xzvf /lty-make/download/python.tar.gz /lty-make/download/python
             cd python # /lty-make/download/python
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/python
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /lty-make/package/python/bin/python3 /usr/bin/python3
                 ln -s /lty-make/package/python/bin/pip3 /usr/bin/pip3
         cd ..
-    elif [[ $2 == "apache" ]]; then
+    elif [[ $2 == "apache" ]]; then # Compiling package apache
         cd /lty-make/download
+            # get source code online
             wget -O /lty-make/download/apache.tar.gz http://www-us.apache.org/dist//httpd/httpd-2.4.34.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/apache.tar.gz /lty-make/download/apache
             cd apache # /lty-make/download/apache
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/apache
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /lty-make/package/apache/bin/httpd /usr/bin/httpd
         cd ..
-    elif [[ $2 == "nginx" ]]; then
+    elif [[ $2 == "nginx" ]]; then # Compiling package nginx
         cd /lty-make/download
+            # get source code online
             wget -O /lty-make/download/nginx.tar.gz http://nginx.org/download/nginx-1.19.2.tar.gz
+            # tar it
             tar -xzvf /lty-make/download/nginx.tar.gz /lty-make/download/nginx
             cd nginx # /lty-make/download/nginx
+                # configure it and create Makefile
                 ./configure --prefix=/lty-make/package/nginx
+                # make it
                 make && make install
+                # create soft linker
                 ln -s /lty-make/package/apache/bin/nginx /usr/bin/nginx
+                # start nginx service
                 nginx start &
         cd ..
     fi
     rm -rf /lty-make/download
 elif [[ $# -eq 2 && $1 == "remove" ]]; then # install package
     if [[ $2 == "require" ]]; then
-        rm -rf /lty-make/package/m4 /usr/bin/m4
-        rm -rf /lty-make/package/m4 /usr/bin/gmp
-        rm -rf /lty-make/package/m4 /usr/bin/mpfr
-        rm -rf /lty-make/package/m4 /usr/bin/mpc
+        rm -rf /lty-make/package/m4 /usr/bin/m4 # remove package m4
+        rm -rf /lty-make/package/m4 /usr/bin/gmp # remove package gmp
+        rm -rf /lty-make/package/m4 /usr/bin/mpfr # remove package mpfr
+        rm -rf /lty-make/package/m4 /usr/bin/mpc # remove package mpc
+        rm -rf /lty-make/package/apr /usr/bin/apr # remove package apr
+        rm -rf /lty-make/package/apr-utils /usr/bin/apr-utils # remove package apr-utils
+        rm -rf /lty-make/package/pcre /usr/bin/pcre # remove package pcre
+        rm -rf /lty-make/package/boost /usr/bin/boost # remove package boost
     elif [[ $2 == "c" || $2 == "c++" || $2 == "gcc" || $2 == "pascal" || $2 == "fortran" ]]; then
-        rm -rf /lty-make/package/gcc /usr/bin/gcc
+        rm -rf /lty-make/package/gcc /usr/bin/gcc # remove package gcc
     elif [[ $2 == "make" ]]; then
-        rm -rf /lty-make/package/make /usr/bin/make
+        rm -rf /lty-make/package/make /usr/bin/make # remove package make
     elif [[ $2 == "git" ]]; then
-        rm -rf /lty-make/package/git /usr/bin/git
+        rm -rf /lty-make/package/git /usr/bin/git # remove package git
     elif [[ $2 == "bash" ]]; then
-        rm -rf /lty-make/package/bash /usr/bin/bash
+        rm -rf /lty-make/package/bash /usr/bin/bash # remove package bash
     elif [[ $2 == "python" ]]; then
-        rm -rf  /lty-make/package/python /usr/bin/python3 /usr/bin/pip3
+        rm -rf  /lty-make/package/python /usr/bin/python3 /usr/bin/pip3 # remove package python
+    elif [[ $2 == "apache" ]]; then
+        rm -rf /lty-make/package/apache /usr/bin/httpd # remove package apache
+    elif [[ $2 == "nginx" ]]; then
+        rm -rf /lty-make/package/nginx /usr/bin/nginx # remove package nginx
+    elif [[ $2 == "mysql" ]]; then
+        rm -rf /lty-make/package/mysql /usr/bin/mysql # remove package mysql 
     fi
 elif [[ $# -eq 7 && $1 == "compiler" ]]; then # old compile
     for i in $2; do
         echo "Compiling $i to object file..." # compile 
-        $2 $3 $6 $5 $i /tmp/$i.obj || exit $?
-        $objects="$objects /tmp/$i.obj"
+        $2 $3 $6 $5 $i /tmp/$i.obj || exit $? # compile to object
+        $objects="$objects /tmp/$i.obj" # add to $objects
     done
     echo "Linking everthing together..." # link
-    $2 $3 $objects $5 $7 || exit $?
+    $2 $3 $objects $5 $7 || exit $? # linking $objects
     echo "done."
 else # help
-    echo "Error: Invaild Command Lines." >&2
-    cat ../README.md >&2
-    exit 1
+    echo "Error: Invaild Command Lines." >&2 # error throwed
+    cat ../README.md >&2 # echo help message
+    exit 1 # status 1
 fi
