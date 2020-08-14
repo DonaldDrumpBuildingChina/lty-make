@@ -65,7 +65,7 @@ function judge(){
         $3
         $compiler=gpc
         $flag=$pasflag
-    elif [[ (${i##*.} == "f90") || (${i##*.} == "f95") || (${i##*.} == "f") || (${i##*.} == "for") ]]; then # C++ language
+    elif [[ (${i##*.} == "f90") || (${i##*.} == "f95") || (${i##*.} == "f") || (${i##*.} == "for") ]]; then # Fortran language
         $4
         $compiler=gfortran
         $flag=$forflag
@@ -74,7 +74,7 @@ function judge(){
     fi
 }
 echo 'Auto-Compile By Liu Tianyou'
-if [[ ($# -eq 3) && ($1 == "auto") ]]; then # auto compile
+if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
     for i in $2; do
         echo "Compiling $i to object file..."
         file_exist $i || { echo "Error: $i isn't exist!"; exit 1 }
@@ -92,16 +92,15 @@ if [[ ($# -eq 3) && ($1 == "auto") ]]; then # auto compile
     done
     echo "Linking everthing together..."
     $compiler $flag $objects -o $3 || exit $? # link
-    echo "done."
-elif [[ ($# -eq 3) && ($1 == "dir") ]]; then
+elif [[ $# -eq 3 && $1 == "dir" ]]; then
     compile_dir $2 $3 "n" 'ls $1' || exit 1
-elif [[ ($# -eq 4) && ($1 == "dir") && ($4 == "-r") ]]; then
+elif [[ $# -eq 4 && $1 == "dir" && ($4 == "-r") ]]; then
     compile_dir $2 $3 "y" 'ls $1' || exit 1
-elif [[ ($# -eq 4) && ($1 == "dir") && (${$4%=*} == "-advance") ]]; then
+elif [[ $# -eq 4 && $1 == "dir" && (${$4%=*} == "-advance") ]]; then
     compile_dir $2 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
-elif [[ ($# -eq 5) && ($1 == "dir") ]]; then
+elif [[ $# -eq 5 && $1 == "dir" ]]; then
     compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
-elif [[ ($# -eq 2) && ($1 == "install") ]]; then # install package
+elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
     if [ $2 == "require" ]; then
         cd /lty-make/download
             wget -O /lty-make/download/m4.tar.gz http://mirrors.kernel.org/gnu/m4/m4-latest.tar.gz
@@ -136,7 +135,7 @@ elif [[ ($# -eq 2) && ($1 == "install") ]]; then # install package
                 $LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/ltymake/package/mpc/libs"
                 ln -s /usr/bin/mpc /ltymake/package/mpc/bin/mpc
         cd ..
-    elif [[ ($2 == "C") || ($2 == "C++") || ($2 == "gcc") || ($2 == "Pascal") || ($2 == "Fortran") ]]; then
+    elif [[ $2 == "C" || $2 == "C++" || $2 == "gcc" || $2 == "Pascal" || $2 == "Fortran" ]]; then
         cd /lty-make/download
             wget -O /lty-make/download/gcc.tar.gz http://mirrors.kernel.org/gnu/gcc/gcc-9.3.0/gcc-9.3.0.tar.gz
             tar -xzvf /lty-make/download/gcc.tar.gz /lty-make/download/gcc
@@ -181,7 +180,7 @@ elif [[ ($# -eq 2) && ($1 == "install") ]]; then # install package
         cd ..
     fi
     rm -rf /lty-make/download
-elif [[ ($# -eq 7) && ($1 == "compiler") ]]; then # old compile
+elif [[ $# -eq 7 && $1 == "compiler" ]]; then # old compile
     for i in $2; do
         echo "Compiling $i to object file..." # compile 
         $2 $3 $6 $5 $i /tmp/$i.obj || exit $?
