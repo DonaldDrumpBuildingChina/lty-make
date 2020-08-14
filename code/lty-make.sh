@@ -14,35 +14,29 @@
 #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+# make some folders
 mkdir /lty-make 2> /dev/null
 mkdir /lty-make/download 2> /dev/null
 mkdir /lty-make/package 2> /dev/null
 
-function file_exist(){ # is file exist?
-    if [ -f $1 ]; then 
-        return 0
-    else
-        return 1
-    fi
-}
 function new(){
-    if [ -f $1 ]; then 
-        touch $1
-        md5sum $2 >> $1
+    if [ ! -f $1 ]; then # no file
+        touch $1 # create it
+        md5sum $2 >> $1 # write down
         exit 1
     fi
-    if [ `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]; then # is new?
-        md5sum $2 >> $1
+    if [ `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]; then # Is new file's md5sum == history md5sum?
+        md5sum $2 >> $1 # write down
         exit 1
     else
         exit 0
     fi
 }
 function compile_dir(){
-    for file in `$5`; do
+    for file in `$5`; do # $5 is "ls -al" etc.
         if [ -d $1"/"$file ]; then
-            if [ $4 == "y" ]; then
-                echo "Going into dircetory: "$1"/"$file
+            if [ $4 == "y" ]; then # -f option on
+                echo "Entering into dircetory: "$1"/"$file
                 compile_dir $1"/"$file $2 $4 $5 # recurrence
                 echo "Leaving into dircetory: "$1"/"$file
             fi
@@ -79,9 +73,9 @@ echo 'Auto-Compile By Liu Tianyou'
 if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
     for i in $2; do
         echo "Compiling $i to object file..."
-        file_exist $i || { echo "Error: $i isn't exist!"; exit 1 }
+        [ -f $i ] || { echo "Error: $i isn't exist!"; exit 1 }
         if new /lty-make/checksum $i; then
-            if file_exist /lty-make/objects/$i.obj; then
+            if [ -f /lty-make/objects/$i.obj ]; then
                 echo "$i is newest. Skiping..."
                 $objects=$objects" /lty-make/objects/"$i".obj" # add a object file to $objects
                 continue
@@ -94,13 +88,13 @@ if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
     done
     echo "Linking everthing together..."
     $compiler $flag $objects -o $3 || exit $? # link
-elif [[ $# -eq 3 && $1 == "dir" ]]; then
+elif [[ $# -eq 3 && $1 == "dir" ]]; then # compile all dir and no options
     compile_dir $2 $3 "n" 'ls $1' || exit 1
-elif [[ $# -eq 4 && $1 == "dir" && ($4 == "-r") ]]; then
+elif [[ $# -eq 4 && $1 == "dir" && ($4 == "-r") ]]; then # -f option on
     compile_dir $2 $3 "y" 'ls $1' || exit 1
-elif [[ $# -eq 4 && $1 == "dir" && (${$4%=*} == "-advance") ]]; then
+elif [[ $# -eq 4 && $1 == "dir" && (${$4%=*} == "-advance") ]]; then # -advance option on
     compile_dir $2 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
-elif [[ $# -eq 5 && $1 == "dir" ]]; then
+elif [[ $# -eq 5 && $1 == "dir" ]]; then # all on
     compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
 elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
     if [ $2 == "require" ]; then
@@ -205,7 +199,7 @@ elif [[ $# -eq 7 && $1 == "compiler" ]]; then # old compile
     for i in $2; do
         echo "Compiling $i to object file..." # compile 
         $2 $3 $6 $5 $i /tmp/$i.obj || exit $?
-        $objects=$objects" /tmp/"$i".obj"
+        $objects="$objects /tmp/$i.obj"
     done
     echo "Linking everthing together..." # link
     $2 $3 $objects $5 $7 || exit $?
