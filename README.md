@@ -13,10 +13,10 @@
 如果想要修改默认的编译参数，请这样做：
 
 ```
-# lty-make.sh cflag 'C编译参数'
-# lty-make.sh cxxflag 'C++编译参数'
-# lty-make.sh pasflag 'Pascal编译参数'
-# lty-make.sh forflag 'Fortran编译参数'
+# lty-make.sh set cflag 'C编译参数'
+# lty-make.sh set cxxflag 'C++编译参数'
+# lty-make.sh set pasflag 'Pascal编译参数'
+# lty-make.sh set forflag 'Fortran编译参数'
 ```
 
 如果你有一个文件夹的单文件项目，试试这个：

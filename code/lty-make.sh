@@ -128,18 +128,18 @@ mkdir /lty-make/package 2> /dev/null
 
 # documents
 function Help(){
-    echo "Error: Invaild Command Lines." > &2
-    cat ../README.md > &2
+    echo "Error: Invaild Command Lines." >&2
+    cat ../README.md >&2
     exit 1
 }
 
 # Is it new file?
 function new(){
-    if [[ ! -f $1 || `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]]; then
+    if [[ ! -f $1 || `cat $1 | grep "$1" | awk '{print $1}'` == `md5sum $1 | awk '{print $1}'` ]]; then
         # create it
         touch $1 2> /dev/null 
         # write down
-        md5sum $2 >> $1 
+        md5sum $1 >> $1 
         exit 1
     fi
 }
@@ -152,15 +152,15 @@ function compile_dir(){
             # before all recurrenced
             echo "Entering into dircetory: $1/$file"
             # recurrence
-            compile_dir $1"/"$file $2 $4 $5 
+            compile_dir $1"/"$file $1 $4 $5 
             # after all recurrenced
             echo "Leaving into dircetory: $1/$file" 
         else
             echo "Compiling $i ..."
             # use gcc to compile C source code
-            judge "gcc $cflag $file -c -o $2/${file%.*}" \ 
+            judge "gcc $cflag $file -c -o $1/${file%.*}" \ 
             # use g++ to compile C++ source code
-            "g++ $cxxflag $file -c -o $2/${file%.*}" \ 
+            "g++ $cxxflag $file -c -o $1/${file%.*}" \ 
             # use gpc (GNU Pascal Compiler) to compile Pascal source code
             "gpc $pasflag $i -c -o /tmp/$i.obj" \ 
             # use gfortran to compile Fortran source code
@@ -184,7 +184,7 @@ function judge(){
         $flag=$cflag
     elif [[ ${i##*.} == "cpp" ]]; then 
         # C++ language
-        echo $2 | bash
+        echo $1 | bash
         $compiler=g++
         $flag=$cxxflag
     elif [[ ${i##*.} == "pas" ]]; then 
@@ -211,7 +211,7 @@ function judge(){
 # Let's see the command lines!
 if [[ $# -eq 3 && $1 == "auto" ]]; then 
     # auto compile
-    for i in $2; do
+    for i in $1; do
         echo "Compiling $i to object file..."
         [[ -f $i ]] || { echo "Error: $i isn't exist!"; exit 1 }
         if new /lty-make/checksum $i; then
@@ -245,27 +245,27 @@ elif [[ $1 == "dir" ]]; then
     # good code!
     if [[ $# -eq 3 ]]; then 
         # compile all dir and no options
-        compile_dir $2 $3 "n" 'ls $1' || exit 1
+        compile_dir $1 $3 "n" 'ls $1' || exit 1
     elif [[ $# -eq 4 && ($4 == "-r") ]]; then 
         # -f option on
-        compile_dir $2 $3 "y" 'ls $1' || exit 1
+        compile_dir $1 $3 "y" 'ls $1' || exit 1
     elif [[ $# -eq 4 && (${$4%=*} == "-advance") ]]; then 
         # -advance option on
-        compile_dir $2 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
+        compile_dir $1 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
     elif [[ $# -eq 5 ]]; then 
         # all on
-        compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
+        compile_dir $1 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
     else
         # do this if status will be changed
         Help || exit $? 
     fi
 elif [[ $# -eq 3 && $1 == "set" ]]; then
-    echo "export $2=$3" > /etc/profile
+    echo "export $1=$3" > /etc/profile
     source /etc/profile
 elif [[ $# -eq 2 && $1 == "install" ]]; then 
     # install package
     cd /lty-make/download 
-    if [[ $2 == "require" ]]; then
+    if [[ $1 == "require" ]]; then
         # Compiling package m4
             # get source code online
             wget -O /lty-make/download/m4.tar.gz http://mirrors.kernel.org/gnu/m4/m4-latest.tar.gz
@@ -369,7 +369,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
                 make && make install
                 # create soft linker
                 ln -s /usr/bin/boost /lty-make/package/apr/bin/boost
-    elif [[ $2 == "mysql" ]]; then # Compiling package mysql
+    elif [[ $1 == "mysql" ]]; then # Compiling package mysql
         # get source code online
         wget -O /lty-make/download/mysql.tar.gz https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.24.tar.gz
         # tar it 
@@ -398,7 +398,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             make && make install
             # create soft linker
             ln -s /usr/bin/mysql /lty-make/package/mysql/bin/mysql
-    elif [[ $2 == "php" ]]; then # Compiling package php
+    elif [[ $1 == "php" ]]; then # Compiling package php
         # get source code online
         wget -O /lty-make/download/php.tar.gz http://php.net/distributions/php-7.4.0.tar.gz
         # tar it 
@@ -456,7 +456,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             # start service
             service php-fpm start
         cd ..
-    elif [[ $2 == "c" || $2 == "c++" || $2 == "gcc" || $2 == "pascal" || $2 == "fortran" ]]; then # Compiling package gcc
+    elif [[ $1 == "c" || $1 == "c++" || $1 == "gcc" || $1 == "pascal" || $1 == "fortran" ]]; then # Compiling package gcc
         # get source code online
         wget -O /lty-make/download/gcc.tar.gz http://mirrors.kernel.org/gnu/gcc/gcc-9.3.0/gcc-9.3.0.tar.gz
         # tar it
@@ -472,7 +472,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             ln -s /usr/bin/gfortran /lty-make/package/gcc/bin/gfortran
             ln -s /usr/bin/gpc /lty-make/package/gcc/bin/gpc
         cd ..
-    elif [[ $2 == "make" ]]; then # Compiling package make
+    elif [[ $1 == "make" ]]; then # Compiling package make
         # get source code online
         wget -O /lty-make/download/make.tar.gz http://mirrors.kernel.org/gnu/make/make-4.3.tar.gz
         # tar it
@@ -484,7 +484,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             make && make install
             # create soft linker
             ln -s /usr/bin/make /lty-make/package/make/bin/make
-    elif [[ $2 == "git" ]]; then # Compiling package git
+    elif [[ $1 == "git" ]]; then # Compiling package git
         # get source code online
         wget -O /lty-make/download/git.tar.gz http://mirrors.kernel.org/gnu/git/gnuit-4.9.5.tar.gz
         # tar it
@@ -496,7 +496,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             make && make install
             # create soft linker
             ln -s /usr/bin/git /lty-make/package/git/bin/git
-    elif [[ $2 == "bash" ]]; then # Compiling package bash
+    elif [[ $1 == "bash" ]]; then # Compiling package bash
         # get source code online
         wget -O /lty-make/download/bash.tar.gz http://mirrors.kernel.org/gnu/bash/bash-5.0.tar.gz
         # tar it
@@ -508,7 +508,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             make && make install
             # create soft linker
             ln -s /usr/bin/bash /lty-make/package/bash/bin/bash
-    elif [[ $2 == "python" ]]; then # Compiling package python
+    elif [[ $1 == "python" ]]; then # Compiling package python
         # get source code online
         wget -O /lty-make/download/python.tar.gz https://www.python.org/ftp/python/3.9.0/Python-3.9.0rc1.tgz
         # tar it
@@ -521,7 +521,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             # create soft linker
             ln -s /lty-make/package/python/bin/python3 /usr/bin/python3
             ln -s /lty-make/package/python/bin/pip3 /usr/bin/pip3
-    elif [[ $2 == "apache" ]]; then # Compiling package apache
+    elif [[ $1 == "apache" ]]; then # Compiling package apache
         # get source code online
         wget -O /lty-make/download/apache.tar.gz http://www-us.apache.org/dist//httpd/httpd-2.4.34.tar.gz
         # tar it
@@ -533,7 +533,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
             make && make install
             # create soft linker
             ln -s /lty-make/package/apache/bin/httpd /usr/bin/httpd
-    elif [[ $2 == "nginx" ]]; then # Compiling package nginx
+    elif [[ $1 == "nginx" ]]; then # Compiling package nginx
         # get source code online
         wget -O /lty-make/download/nginx.tar.gz http://nginx.org/download/nginx-1.19.2.tar.gz
         # tar it
@@ -550,7 +550,7 @@ elif [[ $# -eq 2 && $1 == "install" ]]; then
     fi
     rm -rf /lty-make/download
 elif [[ $# -eq 2 && $1 == "remove" ]]; then # install package
-    if [[ $2 == "require" ]]; then
+    if [[ $1 == "require" ]]; then
         rm -rf /lty-make/package/m4 /usr/bin/m4 # remove package m4
         rm -rf /lty-make/package/m4 /usr/bin/gmp # remove package gmp
         rm -rf /lty-make/package/m4 /usr/bin/mpfr # remove package mpfr
@@ -560,37 +560,37 @@ elif [[ $# -eq 2 && $1 == "remove" ]]; then # install package
         rm -rf /lty-make/package/pcre /usr/bin/pcre # remove package pcre
         rm -rf /lty-make/package/boost /usr/bin/boost # remove package boost
     # else
-    #     rm -rf /lty-make/package/$2 /usr/bin/$2
+    #     rm -rf /lty-make/package/$1 /usr/bin/$1
     # fi
     # For safety, I won't to do this.
-    # it means if $2 == ".." then is will do "rm -rf /lty-make/.." and remove /
-    elif [[ $2 == "c" || $2 == "c++" || $2 == "gcc" || $2 == "pascal" || $2 == "fortran" ]]; then
+    # it means if $1 == ".." then is will do "rm -rf /lty-make/.." and remove /
+    elif [[ $1 == "c" || $1 == "c++" || $1 == "gcc" || $1 == "pascal" || $1 == "fortran" ]]; then
         rm -rf /lty-make/package/gcc /usr/bin/gcc # remove package gcc
-    elif [[ $2 == "make" ]]; then
+    elif [[ $1 == "make" ]]; then
         rm -rf /lty-make/package/make /usr/bin/make # remove package make
-    elif [[ $2 == "git" ]]; then
+    elif [[ $1 == "git" ]]; then
         rm -rf /lty-make/package/git /usr/bin/git # remove package git
-    elif [[ $2 == "bash" ]]; then
+    elif [[ $1 == "bash" ]]; then
         rm -rf /lty-make/package/bash /usr/bin/bash # remove package bash
-    elif [[ $2 == "python" ]]; then
+    elif [[ $1 == "python" ]]; then
         rm -rf  /lty-make/package/python /usr/bin/python3 /usr/bin/pip3 # remove package python
-    elif [[ $2 == "apache" ]]; then
+    elif [[ $1 == "apache" ]]; then
         rm -rf /lty-make/package/apache /usr/bin/httpd # remove package apache
-    elif [[ $2 == "nginx" ]]; then
+    elif [[ $1 == "nginx" ]]; then
         rm -rf /lty-make/package/nginx /usr/bin/nginx # remove package nginx
-    elif [[ $2 == "mysql" ]]; then
+    elif [[ $1 == "mysql" ]]; then
         rm -rf /lty-make/package/mysql /usr/bin/mysql # remove package mysql 
     fi
 elif [[ $# -eq 7 && $1 == "compiler" ]]; then # old compile
-    for i in $2; do
+    for i in $1; do
         echo "Compiling $i to object file..." # compile 
-        $2 $3 $6 $5 $i /tmp/$i.obj || exit $? # compile to object
+        $1 $3 $6 $5 $i /tmp/$i.obj || exit $? # compile to object
         $objects="$objects /tmp/$i.obj" # add to $objects
     done
     echo "Linking everthing together..." # link
-    $2 $3 $objects $5 $7 || exit $? # linking $objects
+    $1 $3 $objects $5 $7 || exit $? # linking $objects
 elif [[ $1 == "do" && $# -eq 3 ]]; then
-    echo $2 | bash
+    echo $1 | bash
 else # Help
     Help || exit $? # me too.
 fi
