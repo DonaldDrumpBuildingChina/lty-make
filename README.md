@@ -55,7 +55,7 @@
 # lty-make.sh remove "gcc"
 ```
 
-试试改成c,c++,fortran,pascal,bash,git,python,apache,php,mysql,nginx!!!（注意，需要先安装依赖）
+试试改成`c`,`c++`,`fortran`,`pascal`,`bash`,`git`,`python`,`apache`,`php`,`mysql`,`nginx`!!!（注意，需要先安装依赖）
 
 同时我们允许自动将一些未经修改的的项目保留，并支持更多语言！
 
