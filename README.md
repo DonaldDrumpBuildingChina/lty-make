@@ -13,37 +13,36 @@
 如果想要修改默认的编译参数，请这样做：
 
 ```
-# export cflag='C编译参数' >> /etc/profile
-# export cxxflag='C++编译参数' >> /etc/profile
-# export pasflag='Pascal编译参数' >> /etc/profile
-# export forflag='Fortran编译参数' >> /etc/profile
-# source /etc/profile
+# lty-make.sh cflag 'C编译参数'
+# lty-make.sh cxxflag 'C++编译参数'
+# lty-make.sh pasflag 'Pascal编译参数'
+# lty-make.sh forflag 'Fortran编译参数'
 ```
 
 如果你有一个文件夹的单文件项目，试试这个：
 
 ```
-# lty-make dir "code" "../"
+# lty-make.sh dir "code" "../"
 ```
 
 你甚至可以规定到正则表达式和是否递归！试试这个：
 
 ```
-# lty-make dir "code" "../" -r
-# lty-make dir "code" "../" '-advance=正则表达式（不会写）'
+# lty-make.sh dir "code" "../" -r
+# lty-make.sh dir "code" "../" '-advance=正则表达式（不会写）'
 ```
 
 要使用老式编译，使用这个：
 
 ```
-# lty-make compiler "g++" "-p -g -O3" "main.cpp hello.cpp" "-o"(output flag) "-c"(only compile flag) "../hello.out"
+# lty-make.sh compiler "g++" "-p -g -O3" "main.cpp hello.cpp" "-o"(output flag) "-c"(only compile flag) "../hello.out"
 ```
 
 新增加的功能：多编译器安装！
 
 ```
-# lty-make install "require"
-# lty-make remove "c++"
+# lty-make.sh install "require"
+# lty-make.sh remove "c++"
 ```
 
 提示：这是实验性功能，编译器安装后会覆盖任何未安装的编译器，请谨慎使用。
@@ -52,8 +51,8 @@
 
 一个更稳妥的方式：
 ```
-# lty-make install "gcc"
-# lty-make remove "gcc"
+# lty-make.sh install "gcc"
+# lty-make.sh remove "gcc"
 ```
 
 试试改成c,c++,fortran,pascal,bash,git,python,apache,php,mysql,nginx!!!（注意，需要先安装依赖）

@@ -16,32 +16,26 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################
 
-################################################
-#               Open Source Mind               #
-#                                              #
-#   For water the code, I want to say something#
-# about open source mind there.                #
-#                                              #
-# I think, the true "Open Source Mind" is NO a-#
-# ny astrist for the code by self. Some license#
-# is good example. How about "DO WHAT THE FUCK #
-# YOU WANT TO PUBLIC LICENSE"? I think it's g- #
-# ood. But "GPL LICENSE" is not UNACCEPTABLE.  #
-#                                              #
-#   However, I think we need open our source.  #
-# Close Source would stifle innovation and I   #
-# don't want to let world to be this.          #
-#                                              #
-#   We need Open Source! It can change the h-  #
-# istoy of human!                              #
-#                                 Liu Tianyou  #
-#                             2020/8/14 18:15  #
-################################################
+# echo massage
+echo 'Auto-Compile By Liu Tianyou'
+
+# check root user
+if [[ $EUID -ne 0 ]]; then
+    echo "Using this scipt's user is NOT root. Did you forget using \"sudo\"?"
+    exit 1
+fi
 
 # make some folders
 mkdir /lty-make 2> /dev/null
 mkdir /lty-make/download 2> /dev/null
 mkdir /lty-make/package 2> /dev/null
+
+# documents
+function Help(){
+    echo "Error: Invaild Command Lines." > &2
+    cat ../README.md > &2
+    exit 1
+}
 
 # Is it new file?
 function new(){
@@ -100,7 +94,6 @@ function judge(){
     fi
 }
 
-echo 'Auto-Compile By Liu Tianyou'
 # Let's see the command lines!
 if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
     for i in $2; do
@@ -125,14 +118,21 @@ if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
     done
     echo "Linking everthing together..."
     $compiler $flag $objects -o $3 || exit $? # link
-elif [[ $# -eq 3 && $1 == "dir" ]]; then # compile all dir and no options
-    compile_dir $2 $3 "n" 'ls $1' || exit 1
-elif [[ $# -eq 4 && $1 == "dir" && ($4 == "-r") ]]; then # -f option on
-    compile_dir $2 $3 "y" 'ls $1' || exit 1
-elif [[ $# -eq 4 && $1 == "dir" && (${$4%=*} == "-advance") ]]; then # -advance option on
-    compile_dir $2 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
-elif [[ $# -eq 5 && $1 == "dir" ]]; then # all on
-    compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
+elif [[ $1 == "dir" ]]; then # good code!
+    elif [[ $# -eq 3 ]]; then # compile all dir and no options
+        compile_dir $2 $3 "n" 'ls $1' || exit 1
+    elif [[ $# -eq 4 && ($4 == "-r") ]]; then # -f option on
+        compile_dir $2 $3 "y" 'ls $1' || exit 1
+    elif [[ $# -eq 4 && (${$4%=*} == "-advance") ]]; then # -advance option on
+        compile_dir $2 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
+    elif [[ $# -eq 5 ]]; then # all on
+        compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
+    else
+        Help || exit $?
+    fi
+elif [[ $# -eq 3 && $1 == "set" ]]; then
+    echo "export $2=$3" > /etc/profile
+    source /etc/profile
 elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
     cd /lty-make/download 
     if [[ $2 == "require" ]]; then
@@ -470,8 +470,6 @@ elif [[ $# -eq 7 && $1 == "compiler" ]]; then # old compile
     echo "Linking everthing together..." # link
     $2 $3 $objects $5 $7 || exit $? # linking $objects
     echo "done."
-else # help
-    echo "Error: Invaild Command Lines." >&2 # error throwed
-    cat ../README.md >&2 # echo help message
-    exit 1 # status 1
+else # Help
+    Help || exit $?
 fi
