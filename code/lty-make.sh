@@ -58,27 +58,39 @@ function Help(){
 # Is it new file?
 function new(){
     if [[ ! -f $1 || `cat $1 | grep "$2" | awk '{print $1}'` == `md5sum $2 | awk '{print $1}'` ]]; then
-        touch $1 2> /dev/null # create it
-        md5sum $2 >> $1 # write down
+        # create it
+        touch $1 2> /dev/null 
+        # write down
+        md5sum $2 >> $1 
         exit 1
     fi
 }
 
 # Compile all folder
 function compile_dir(){
-    for file in `echo $5 | bash`; do # $5 is "ls -al" etc.
+    # $5 is "ls -al" etc.
+    for file in `echo $5 | bash`; do
         if [[ -d $1"/"$file && $4 == "y" ]]; then
-            echo "Entering into dircetory: $1/$file" # befor all recurrenced
-            compile_dir $1"/"$file $2 $4 $5 # recurrence
-            echo "Leaving into dircetory: $1/$file" # after all recurrenced
+            # before all recurrenced
+            echo "Entering into dircetory: $1/$file"
+            # recurrence
+            compile_dir $1"/"$file $2 $4 $5 
+            # after all recurrenced
+            echo "Leaving into dircetory: $1/$file" 
         else
             echo "Compiling $i ..."
-            judge "gcc $cflag $file -c -o $2/${file%.*}" \ # use gcc to compile C source code
-            "g++ $cxxflag $file -c -o $2/${file%.*}" \ # use g++ to compile C++ source code
-            "gpc $pasflag $i -c -o /tmp/$i.obj" \ # use gpc (GNU Pascal Compiler) to compile Pascal source code
-            "gfortran $forflag $i -c -o /tmp/$i.obj" \ # use gfortran to compile Fortran source code
-            "gcj $javaflag $i -c -o /tmp/$i.obj || exit 1" \ # use gcj to compile java source code
-            'echo "Warning: Cannot judge the type of $file." >&2' # cannot understand the suffix name
+            # use gcc to compile C source code
+            judge "gcc $cflag $file -c -o $2/${file%.*}" \ 
+            # use g++ to compile C++ source code
+            "g++ $cxxflag $file -c -o $2/${file%.*}" \ 
+            # use gpc (GNU Pascal Compiler) to compile Pascal source code
+            "gpc $pasflag $i -c -o /tmp/$i.obj" \ 
+            # use gfortran to compile Fortran source code
+            "gfortran $forflag $i -c -o /tmp/$i.obj" \ 
+            # use gcj to compile java source code
+            "gcj $javaflag $i -c -o /tmp/$i.obj || exit 1" \ 
+            # cannot understand the suffix name
+            'echo "Warning: Cannot judge the type of $file." >&2' 
         fi
     done
 } 
@@ -87,23 +99,28 @@ function compile_dir(){
 function judge(){
     # Caution: echo "xxx" | bash can select a pid and fork it.
     # So, Can not edit vars.
-    if [[ ${i##*.} == "c" ]]; then # judge file type, ${i##*.} means suffix name. (C language)
+    if [[ ${i##*.} == "c" ]]; then 
+        # judge file type, ${i##*.} means suffix name. (C language)
         echo $1 | bash
         $compiler=gcc
         $flag=$cflag
-    elif [[ ${i##*.} == "cpp" ]]; then # C++ language
+    elif [[ ${i##*.} == "cpp" ]]; then 
+        # C++ language
         echo $2 | bash
         $compiler=g++
         $flag=$cxxflag
-    elif [[ ${i##*.} == "pas" ]]; then # Pascal language
+    elif [[ ${i##*.} == "pas" ]]; then 
+        # Pascal language
         echo $3 | bash
         $compiler=gpc
         $flag=$pasflag
-    elif [[ (${i##*.} == "f90") || (${i##*.} == "f95") || (${i##*.} == "f") || (${i##*.} == "for") ]]; then # Fortran language
+    elif [[ (${i##*.} == "f90") || (${i##*.} == "f95") || (${i##*.} == "f") || (${i##*.} == "for") ]]; then 
+        # Fortran language
         echo $4 | bash
         $compiler=gfortran
         $flag=$forflag
-    elif [[ ${i##*.} == "java" ]]; then # Java language
+    elif [[ ${i##*.} == "java" ]]; then 
+        # Java language
         echo $5 | bash
         $compiler=gcj
         $flag=$javaflag
@@ -113,45 +130,61 @@ function judge(){
 }
 
 # Let's see the command lines!
-if [[ $# -eq 3 && $1 == "auto" ]]; then # auto compile
+if [[ $# -eq 3 && $1 == "auto" ]]; then 
+    # auto compile
     for i in $2; do
         echo "Compiling $i to object file..."
         [[ -f $i ]] || { echo "Error: $i isn't exist!"; exit 1 }
         if new /lty-make/checksum $i; then
+            # add a object file to $objects
             if [[ -f /lty-make/objects/$i.obj ]]; then
                 echo "$i is newest. Skiping..."
-                $objects=$objects" /lty-make/objects/"$i".obj" # add a object file to $objects
+                $objects=$objects" /lty-make/objects/"$i".obj" 
                 continue
             else
                 echo "/lty-make/objects/$i.obj is not exist. Compiling..."
             fi
         fi
-        judge "gcc $cflag $i -c -o /tmp/$i.obj || exit 1;" \ # use gcc to compile C source code
-        "g++ $cxxflag $i -c -o /tmp/$i.obj || exit 1" \ # use g++ to compile C++ source code
-        "gpc $pasflag $i -c -o /tmp/$i.obj || exit 1" \ # use gpc (GNU Pascal Compiler) to compile Pascal source code
-        "gfortran $forflag $i -c -o /tmp/$i.obj || exit 1" \ # use gfortran to compile Fortran source code
-        "gcj $javaflag $i -c -o /tmp/$i.obj || exit 1" \ # use gcj to compile java source code
-        "echo Error: Cannot judge the type of $i. >&2; exit 1" # cannot understand the suffix name
+        # use gcc to compile C source code
+        judge "gcc $cflag $i -c -o /tmp/$i.obj || exit 1;" \ 
+        # use g++ to compile C++ source code
+        "g++ $cxxflag $i -c -o /tmp/$i.obj || exit 1" \ 
+        # use gpc (GNU Pascal Compiler) to compile Pascal source code
+        "gpc $pasflag $i -c -o /tmp/$i.obj || exit 1" \ 
+        # use gfortran to compile Fortran source code
+        "gfortran $forflag $i -c -o /tmp/$i.obj || exit 1" \ 
+        # use gcj to compile java source code
+        "gcj $javaflag $i -c -o /tmp/$i.obj || exit 1" \ 
+        # cannot understand the suffix name
+        "echo Error: Cannot judge the type of $i. >&2; exit 1" 
         $objects="$objects /lty-make/objects/$i.obj"
     done
+    # link
     echo "Linking everthing together..."
-    $compiler $flag $objects -o $3 || exit $? # link
-elif [[ $1 == "dir" ]]; then # good code!
-    elif [[ $# -eq 3 ]]; then # compile all dir and no options
+    $compiler $flag $objects -o $3 || exit $? 
+elif [[ $1 == "dir" ]]; then 
+    # good code!
+    if [[ $# -eq 3 ]]; then 
+        # compile all dir and no options
         compile_dir $2 $3 "n" 'ls $1' || exit 1
-    elif [[ $# -eq 4 && ($4 == "-r") ]]; then # -f option on
+    elif [[ $# -eq 4 && ($4 == "-r") ]]; then 
+        # -f option on
         compile_dir $2 $3 "y" 'ls $1' || exit 1
-    elif [[ $# -eq 4 && (${$4%=*} == "-advance") ]]; then # -advance option on
+    elif [[ $# -eq 4 && (${$4%=*} == "-advance") ]]; then 
+        # -advance option on
         compile_dir $2 $3 "n" 'ls $1|grep '${$4##*=} || exit 1
-    elif [[ $# -eq 5 ]]; then # all on
+    elif [[ $# -eq 5 ]]; then 
+        # all on
         compile_dir $2 $3 "y" 'ls $1|grep '${$4##*=} || exit 1
     else
-        Help || exit $? # do this if status will be changed
+        # do this if status will be changed
+        Help || exit $? 
     fi
 elif [[ $# -eq 3 && $1 == "set" ]]; then
     echo "export $2=$3" > /etc/profile
     source /etc/profile
-elif [[ $# -eq 2 && $1 == "install" ]]; then # install package
+elif [[ $# -eq 2 && $1 == "install" ]]; then 
+    # install package
     cd /lty-make/download 
     if [[ $2 == "require" ]]; then
         # Compiling package m4
