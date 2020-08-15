@@ -203,6 +203,7 @@ function judge(){
         $compiler=gcj
         $flag=$javaflag
     else
+        # else
         echo $6 | bash
     fi
 }
