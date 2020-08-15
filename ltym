@@ -126,10 +126,15 @@ mkdir /lty-make 2> /dev/null
 mkdir /lty-make/download 2> /dev/null
 mkdir /lty-make/package 2> /dev/null
 
+if [ $1 = "test" ]
+then
+    # debug
+    Help
+fi
 # documents
 function Help(){
-    echo "Error: Invaild Command Lines." >&2
-    cat ../README.md >&2
+    echo "Error: Invaild Command Lines." # > &2
+    cat ../README.md # > &2
     exit 1
 }
 
@@ -209,14 +214,18 @@ function judge(){
 }
 
 # Let's see the command lines!
-if [[ $# -eq 3 && $1 == "auto" ]]; then 
+if [[ $# -eq 3 && $1 == "auto" ]]
+then 
     # auto compile
-    for i in $1; do
+    for i in $2
+    do
         echo "Compiling $i to object file..."
         [[ -f $i ]] || { echo "Error: $i isn't exist!"; exit 1 }
-        if new /lty-make/checksum $i; then
+        if new /lty-make/checksum $i
+        then
             # add a object file to $objects
-            if [[ -f /lty-make/objects/$i.obj ]]; then
+            if [[ -f /lty-make/objects/$i.obj ]]
+            then
                 echo "$i is newest. Skiping..."
                 $objects=$objects" /lty-make/objects/"$i".obj" 
                 continue
