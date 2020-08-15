@@ -126,10 +126,14 @@ mkdir /lty-make 2> /dev/null
 mkdir /lty-make/download 2> /dev/null
 mkdir /lty-make/package 2> /dev/null
 
+if [ $1 -eq "test" ]; then
+    # debug
+    Help()
+fi
 # documents
 function Help(){
-    echo "Error: Invaild Command Lines." > &2
-    cat ../README.md > &2
+    echo "Error: Invaild Command Lines." # > &2
+    cat ../README.md # > &2
     exit 1
 }
 
