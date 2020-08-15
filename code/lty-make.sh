@@ -588,6 +588,8 @@ elif [[ $# -eq 7 && $1 == "compiler" ]]; then # old compile
     done
     echo "Linking everthing together..." # link
     $2 $3 $objects $5 $7 || exit $? # linking $objects
+elif [[ $1 == "do" && $# -eq 3 ]]; then
+    echo $2 | bash
 else # Help
     Help || exit $? # me too.
 fi
