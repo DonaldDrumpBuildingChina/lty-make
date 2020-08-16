@@ -25,6 +25,6 @@ private:
     std::pair<std::string, std::string> last;
 public:
     template <typename T> platform(const T&);
-    void all_compile();
+    std::pair<std::string, std::string> all_compile();
     int all_link(std::string);
 };
