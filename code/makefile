@@ -11,11 +11,11 @@ lty-make: objects/functions.o objects/platform.o objects/source_code.o
 	rm -rf tmp 
 	g++ objects/functions.o objects/platform.o objects/source_code.o -std=gnu++11 -Wall -g -p -o lty-make
 objects/functions.o: functions/functions.hpp functions/functions.cpp
-	g++ functions/functions.cpp -std=gnu++11 -Wall -g -p -c -o objects/functions.o
+	g++ -c functions/functions.cpp -std=gnu++11 -Wall -g -p -o objects/functions.o
 objects/platform.o: platform/platform.hpp platform/platform.cpp
-	g++ platform/platform.cpp -std=gnu++11 -Wall -g -p -c -o objects/platform.o
+	g++ -c platform/platform.cpp -std=gnu++11 -Wall -g -p -o objects/platform.o
 objects/source_code.o: source_code/source_code.hpp source_code/source_code.cpp
-	g++ source_code/source_code.cpp -std=gnu++11 -Wall -g -p -c -o objects/source_code.o
+	g++ -c source_code/source_code.cpp -std=gnu++11 -Wall -g -p -o objects/source_code.o
 install:
 	-ln -s `pwd`/lty-make /usr/bin
 	-ln -s `pwd`/scripts /usr/bin
