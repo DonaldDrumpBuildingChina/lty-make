@@ -20,16 +20,11 @@ template <typename T> platform::platform(const T&){
     }
 }
 void platform::all_compile(){
-    try{
-        for(auto it = files.begin(); it != files.end(); it++){
-            last = it->auto_compile();
-            objects = stringplus((std::initializer_list<std::string>){objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
-            
-        }
-    }catch(std::logic_error except){
-        throw except;
-    }
+    for(auto it = files.begin(); it != files.end(); it++){
+        last = it->auto_compile();
+        objects = stringplus((std::initializer_list<std::string>){objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
+    }    
 }
 int platform::all_link(std::string target){
-    return system(stringplus((std::initializer_list<std::string>){"ld", objects, "-lstdc++ -lm -o", target}).c_str());
+    return system(stringplus((std::initializer_list<std::string>){"ld", objects, getenv("ldflags"), "-lstdc++ -lm -o", target}).c_str());
 }

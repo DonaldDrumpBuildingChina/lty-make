@@ -14,17 +14,24 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #pragma once
-#include "source_code.hpp"
-#include "functions.hpp"
-#include <vector>
+#include <fstream>
+#include <initializer_list>
+#include <sstream>
 #include <string>
-class platform{ //项目类
-private:
-    std::vector<source_code> files; //项目文件列表
-    std::string objects; //目标文件列表
-    std::pair<std::string, std::string> last;
-public:
-    template <typename T> platform(const T&); //构造函数
-    void all_compile(); //全部编译
-    int all_link(std::string); //全部链接
-};
+#include <vector>
+
+#ifdef unix
+    #include <dirent.h>
+    #include <fcntl.h>
+    #include <sys/stat.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+#else
+    #include <io.h>
+#endif
+
+template <typename T>
+std::string stringplus(const T&);
+void set(std::string, std::string);
+void dir(std::string, void (*)(std::string), bool);
+std::vector<std::string> forstring(std::string);

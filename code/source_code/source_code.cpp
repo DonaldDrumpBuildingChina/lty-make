@@ -15,10 +15,6 @@
 ######################################################################*/
 #include "source_code.hpp"
 source_code::source_code(std::string _filename){ 
-    source.open(_filename);
-    if (!source.is_open()){
-        throw std::runtime_error("错误：文件不能被打开。");
-    }
     filename = _filename;
     name = filename.substr(0, filename.find_last_of(".")+1);
     suffix = filename.substr(filename.find_last_of(".")+1, filename.end()-filename.begin());
@@ -40,15 +36,12 @@ std::pair<std::string, std::string> source_code::auto_compile(){
         system(stringplus((std::initializer_list<std::string>){"gcj", filename, getenv("javaflag"), "-c -o /tmp/", filename, ".obj"}).c_str()); //Java语言
         return std::pair<std::string, std::string>("gcj", getenv("javaflag"));
     }else{
-        throw std::logic_error("错误：找不到匹配的文件类型。"); //抛出logic_error
+        throw std::runtime_error("错误：找不到匹配的文件类型。");
     }
 }
 bool source_code::new_file(std::string _filename){ 
-    return !system(stringplus((std::initializer_list<std::string>){"md5sum.sh", _filename, filename}).c_str());
+    return !system(stringplus((std::initializer_list<std::string>){"scripts/md5sum.sh", _filename, filename}).c_str());
 }
 std::string source_code::getName(){
     return filename;
-}
-source_code::~source_code(){ 
-    source.close();
 }

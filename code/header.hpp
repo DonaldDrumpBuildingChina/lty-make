@@ -14,21 +14,6 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #pragma once
-#include <fstream>
-#include <string>
-#include <exception>
-#include <initializer_list>
-#include "functions.hpp"
-//源代码类
-class source_code
-{
-private:
-    std::ifstream source; //源代码文件
-    std::string filename, name, suffix; //文件名，前缀名，后缀名
-public:
-    source_code(std::string); //构造函数，用于打开一个文件
-    std::pair<std::string, std::string> auto_compile(); //自动编译一个文件，返回编译器和命令行
-    bool new_file(std::string); //检查文件是否为最新
-    std::string getName();
-    ~source_code(); //析构函数，用于关闭文件
-};
+#include "source_code/source_code.hpp" 
+#include "platform/platform.hpp"
+#include "functions/functions.hpp"

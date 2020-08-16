@@ -14,12 +14,17 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #pragma once
-#include <initializer_list>
-#include <string>
-#include <sstream>
+#include "../source_code/source_code.hpp"
+#include "functions.hpp"
 #include <vector>
-#include <fstream>
-//声明函数
-template <typename T> std::string stringplus(const T&); //字符串拼接
-void set(std::string, std::string); //设置环境变量
-void dir(std::string, std::string, bool, std::string = ""); //递归文件夹
+#include <string>
+class platform{
+private:
+    std::vector<source_code> files;
+    std::string objects;
+    std::pair<std::string, std::string> last;
+public:
+    template <typename T> platform(const T&);
+    void all_compile();
+    int all_link(std::string);
+};

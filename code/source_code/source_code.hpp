@@ -14,7 +14,19 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #pragma once
-//总头文件，让编译器找得到类声明
-#include "source_code.hpp" 
+#include <fstream>
+#include <string>
+#include <exception>
+#include <initializer_list>
 #include "functions.hpp"
-#include "platform.hpp"
+//源代码类
+class source_code
+{
+private:
+    std::string filename, name, suffix;
+public:
+    source_code(std::string);
+    std::pair<std::string, std::string> auto_compile();
+    bool new_file(std::string);
+    std::string getName();
+};
