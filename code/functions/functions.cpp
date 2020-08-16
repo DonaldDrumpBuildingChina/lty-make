@@ -27,7 +27,6 @@ void set(std::string name, std::string value){
     setenv(name.c_str(), value.c_str(), 1);
 }
 void dir(std::string _dir, void (*word)(std::string), bool r){
-#ifdef unix
     DIR* p_dir = NULL;
     struct dirent* p_entry = NULL;
     struct stat statbuf;
@@ -45,23 +44,6 @@ void dir(std::string _dir, void (*word)(std::string), bool r){
     }
     chdir("..");
     closedir(p_dir);
-#else
-    long hFile = 0;
-    struct _finddata_t fileinfo;
-    std::string p;
-    if ((hFile = _findfirst(p.assign(_dir).append("\\*").c_str(), &fileinfo)) != -1) {
-        do {
-            if ((fileinfo.attrib & _A_SUBDIR)) {
-                if (strcmp(fileinfo.name, ".") != 0 && strcmp(fileinfo.name, "..") != 0) {
-                    fir(p.assign(path).append("\\").append(fileinfo.name), word, r);
-                }
-            } else {
-                word(fileinfo.name);
-            }
-        } while (_findnext(hFile, &fileinfo) == 0);
-        _findclose(hFile);
-    }
-#endif
 }
 std::vector<std::string> forstring(std::string str){
     std::string temp;
@@ -70,5 +52,5 @@ std::vector<std::string> forstring(std::string str){
     while(sscanf(str.c_str(),"%s",&temp[0])){
         files.push_back(temp);
     }
-    return temp;
+    return files;
 }

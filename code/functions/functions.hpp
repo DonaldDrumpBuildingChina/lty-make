@@ -19,16 +19,11 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-#ifdef unix
-    #include <dirent.h>
-    #include <fcntl.h>
-    #include <sys/stat.h>
-    #include <sys/types.h>
-    #include <unistd.h>
-#else
-    #include <io.h>
-#endif
+#include <dirent.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 template <typename T>
 std::string stringplus(const T&);
