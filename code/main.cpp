@@ -5,6 +5,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
 int main(int argc, char** argv){
+    cout<<"lty-make 基于"<<endl<<GPP_V<<endl<<MAKE_V<<"构建。"<<endl;
     try{
         string *argvs = new string [argc];
         for(int i = 0; i < argc; i++){
@@ -39,5 +40,6 @@ int main(int argc, char** argv){
         cerr<<"未知错误！"<<endl;
         return 1;
     }
+    cout<<"运行完毕。"<<endl;
     return 0;
 }

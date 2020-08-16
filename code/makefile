@@ -1,9 +1,15 @@
 .PHONY: install uninstall dist clean
 lty-make: objects/functions.o objects/platform.o objects/source_code.o
-	g++ objects/functions.o objects/platform.o objects/source_code.o -std=gnu++11 -Wall -o lty-make
 	-mkdir /lty-make
 	-mkdir /lty-make/download
 	-mkdir /lty-make/package
+	echo "#pragma once" > make.hpp
+	g++ -v > tmp
+	echo "#define GPP_V `head -n 9 tmp`" >> make.hpp 
+	make -v > tmp
+	echo "#define MAKE_V `head -n 1 tmp`" >> make.hpp
+	rm -rf tmp 
+	g++ objects/functions.o objects/platform.o objects/source_code.o -std=gnu++11 -Wall -o lty-make
 objects/functions.o: functions/functions.hpp functions/functions.cpp
 	g++ functions/functions.cpp -std=gnu++11 -Wall -c -o objects/functions.o
 objects/platform.o: platform/platform.hpp platform/platform.cpp
