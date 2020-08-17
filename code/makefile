@@ -13,9 +13,9 @@
 #                                                                    #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################
-.PHONY: install uninstall dist clean
-lty-make: objects/functions.o objects/platform.o objects/source_code.o objects/main.o init
-	g++ objects/functions.o objects/platform.o objects/source_code.o objects/main.o -std=c++11 -Wall -g -p -o ../lty-make
+.PHONY: install uninstall dist clean init
+lty-make: objects/functions.o objects/platform.o objects/source_code.o objects/main.o 
+	g++ objects/main.o objects/functions.o objects/source_code.o objects/platform.o -std=c++11 -Wall -g -p -o ../lty-make
 objects/functions.o: functions/functions.hpp functions/functions.cpp
 	g++ -c functions/functions.cpp -std=c++11 -Wall -g -p -o objects/functions.o
 objects/platform.o: platform/platform.hpp platform/platform.cpp
@@ -27,23 +27,22 @@ objects/main.o: header.hpp main.cpp
 install:
 	-ln -s `pwd`/lty-make /usr/bin
 	-ln -s `pwd`/scripts /usr/bin
-uninstall: clean
-	-rm -rf /usr/bin/lty-make
-	-rm -rf /usr/bin/scripts
 dist:
 	tar -czf ../lty-make.tar.gz .
 init:
 	@-mkdir /lty-make
 	@-mkdir /lty-make/download
 	@-mkdir /lty-make/package
+	@-mkdir objects
 	@echo "#pragma once" > make.hpp
 	@g++ -v 2> tmp
 	@echo "#define GCC_V \"`sed -n '9p' < tmp`\"" >> make.hpp 
 	@make -v > tmp
 	@echo "#define MAKE_V \"`head -n 1 tmp`\"" >> make.hpp
 	@rm -rf tmp 
-	@-touch init
 clean:
 	-rm -rf objects
 	-rm -rf lty-make
-	-rm -f init
+	-rm -rf /usr/bin/lty-make
+	-rm -rf /usr/bin/scripts
+	-rm -rf /lty-make
