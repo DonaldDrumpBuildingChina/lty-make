@@ -1,5 +1,27 @@
 # Auto-Compile By Liu Tianyou
 
+### 如何构建lty-make？
+
+如果你是第一次使用，请使用这些：
+
+```
+sudo su root
+make init && make && make install
+```
+
+如果你已经成功构建过一次，请使用这些清除：
+
+```
+make clean && make init
+```
+
+这里还有别的工具：
+
+```
+make dist
+make install-require
+```
+
 一般来说，想要编译一个（单/多文件）项目，只需要运行以下的命令行：
 
 ```

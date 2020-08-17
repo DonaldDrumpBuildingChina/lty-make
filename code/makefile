@@ -13,17 +13,18 @@
 #                                                                    #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################
-.PHONY: install uninstall dist clean init
+flag = -std=c++11 -Wall -g -p -O3 -Wunused-result
+.PHONY: install dist clean init install-require
 lty-make: objects/functions.o objects/platform.o objects/source_code.o objects/main.o 
-	g++ objects/main.o objects/functions.o objects/source_code.o objects/platform.o -std=c++11 -Wall -g -p -o ../lty-make
+	g++ objects/main.o objects/functions.o objects/source_code.o objects/platform.o $(flag) -o ../lty-make
 objects/functions.o: functions/functions.hpp functions/functions.cpp
-	g++ -c functions/functions.cpp -std=c++11 -Wall -g -p -o objects/functions.o
+	g++ -c functions/functions.cpp $(flag) -o objects/functions.o
 objects/platform.o: platform/platform.hpp platform/platform.cpp
-	g++ -c platform/platform.cpp -std=c++11 -Wall -g -p -o objects/platform.o
+	g++ -c platform/platform.cpp $(flag) -o objects/platform.o
 objects/source_code.o: source_code/source_code.hpp source_code/source_code.cpp
-	g++ -c source_code/source_code.cpp -std=c++11 -Wall -g -p -o objects/source_code.o
+	g++ -c source_code/source_code.cpp $(flag) -o objects/source_code.o
 objects/main.o: header.hpp main.cpp
-	g++ -c main.cpp -std=c++11 -Wall -g -p -o objects/main.o
+	g++ -c main.cpp $(flag) -o objects/main.o
 install:
 	-ln -s `pwd`/lty-make /usr/bin
 	-ln -s `pwd`/scripts /usr/bin
@@ -40,6 +41,8 @@ init:
 	@make -v > tmp
 	@echo "#define MAKE_V \"`head -n 1 tmp`\"" >> make.hpp
 	@rm -rf tmp 
+install-require: 
+	command -v apt > /dev/null 2>&1 && { apt update -y; apt upgrade -y; apt install gcc make -y } || { yum update -y; apt install gcc make -y }
 clean:
 	-rm -rf objects
 	-rm -rf lty-make
