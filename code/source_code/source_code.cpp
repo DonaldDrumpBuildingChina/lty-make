@@ -42,3 +42,9 @@ bool source_code::new_file(std::string _filename){
 inline std::string source_code::getName(){
     return filename;
 }
+inline std::string source_code::getname(){
+    return name;
+}
+inline std::string source_code::getsuffix(){
+    return suffix;
+}

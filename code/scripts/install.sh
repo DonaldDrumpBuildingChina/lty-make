@@ -1,4 +1,4 @@
-
+#!/bin/bash
 if [[ $# -eq 2 && $1 == "install" ]]; then
     cd /lty-make/download 
     if [[ $2 == "require" ]]; then

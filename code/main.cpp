@@ -19,10 +19,11 @@
 #include <iostream>
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
+string *argvs;
 int main(int argc, char** argv){
     cout<<"lty-make 基于"<<GPP_V<<"和"<<MAKE_V<<"构建。"<<endl;
     try{
-        string *argvs = new string [argc];
+        argvs = new string [argc];
         for(int i = 0; i < argc; i++){
             argvs[i] = string(argv[i]);
         }
@@ -31,7 +32,12 @@ int main(int argc, char** argv){
             pf.all_compile();
             pf.all_link(argvs[3]);
         }else if(argvs[1] == "dir"){
-            auto compile = [](string name){};
+            auto compile = [](string name){
+                source_code source(name);
+                auto status = source.auto_compile();
+                system(stringplus((std::initializer_list<std::string>){status.first, source.getName(),\
+                status.second, "-o", argvs[3], "/", source.getsuffix()}).c_str());
+            };
             if(argc == 3){
                 dir(argvs[2],compile,false);
             }else if(argc == 4){

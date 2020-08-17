@@ -30,4 +30,6 @@ public:
     std::pair<std::string, std::string> auto_compile();
     bool new_file(std::string);
     std::string getName();
+    std::string getname();
+    std::string getsuffix();
 };
