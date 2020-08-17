@@ -14,7 +14,7 @@
 #                                                                    #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################
-if [[ ! -f $1 || `cat $1 | grep "$1" | awk '{print $1}'` == `md5sum $1 | awk '{print $1}'` ]]; then
+if [[ ! -f $1 || ! -f "/tmp/$i.obj" || `cat $1 | grep "$1" | awk '{print $1}'` == `md5sum $1 | awk '{print $1}'` ]]; then
     # create it
     touch $1 2> /dev/null 
     # write down

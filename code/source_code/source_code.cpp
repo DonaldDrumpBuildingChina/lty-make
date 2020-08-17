@@ -18,30 +18,27 @@ source_code::source_code(std::string _filename){
     filename = _filename;
     name = filename.substr(0, filename.find_last_of(".")+1);
     suffix = filename.substr(filename.find_last_of(".")+1, filename.end()-filename.begin());
+    compilers["c"]=std::pair<std::string, std::string>("gcc", getenv("cflag"));
+    compilers["cpp"]=compilers["cxx"]=compilers["C"]=std::pair<std::string, std::string>("g++", getenv("cxxflag"));
+    compilers["pas"]=std::pair<std::string, std::string>("gpc", getenv("pasflag"));
+    compilers["f90"]=compilers["f95"]=compilers["f"]=compilers["for"]=\
+    std::pair<std::string, std::string>("gfortran", getenv("forflag"));
+    compilers["java"]=std::pair<std::string, std::string>("gcj", getenv("javaflag"));
 }
 std::pair<std::string, std::string> source_code::auto_compile(){ 
-    if(suffix == "c"){
-        system(stringplus((std::initializer_list<std::string>){"gcc", filename, getenv("cflag"), " -c -o /tmp/", filename, ".obj"}).c_str()); //C语言
-        return std::pair<std::string, std::string>("gcc", getenv("cflag"));
-    }else if(suffix == "cpp" || suffix == "cxx" || suffix == "C"){
-        system(stringplus((std::initializer_list<std::string>){"g++", filename, getenv("cxxflag"), "-c -o /tmp/", filename, ".obj"}).c_str()); //C++语言
-        return std::pair<std::string, std::string>("g++", getenv("cxxflag"));
-    }else if(suffix == "pas"){
-        system(stringplus((std::initializer_list<std::string>){"gpc", filename, getenv("pasflag"), "-c -o /tmp/", filename, ".obj"}).c_str()); //Pascal语言
-        return std::pair<std::string, std::string>("gpc", getenv("pasflag"));
-    }else if(suffix == "f90" || suffix == "f95" || suffix == "f" || suffix == "for"){
-        system(stringplus((std::initializer_list<std::string>){"gfortran", filename, getenv("forflag"), "-c -o /tmp/", filename, ".obj"}).c_str()); //Fortran语言
-        return std::pair<std::string, std::string>("gfortran", getenv("forflag"));
-    }else if(suffix == "java"){
-        system(stringplus((std::initializer_list<std::string>){"gcj", filename, getenv("javaflag"), "-c -o /tmp/", filename, ".obj"}).c_str()); //Java语言
-        return std::pair<std::string, std::string>("gcj", getenv("javaflag"));
-    }else{
-        throw std::runtime_error("错误：找不到匹配的文件类型。");
+    if(new_file("/lty-make/md5sum.txt")==1){
+        if(compilers.find(suffix)==compilers.end()){
+            throw std::runtime_error("错误：找不到文件类型。");
+        }
+        system(stringplus((std::initializer_list<std::string>){compilers[suffix].first, "-c",\
+        filename, compilers[suffix].second,"-o",\
+        stringplus((std::initializer_list<std::string>){"/tmp/", filename, ".obj"})}).c_str());
     }
+    return compilers[suffix];
 }
 bool source_code::new_file(std::string _filename){ 
     return !system(stringplus((std::initializer_list<std::string>){"scripts/md5sum.sh", _filename, filename}).c_str());
 }
-std::string source_code::getName(){
+inline std::string source_code::getName(){
     return filename;
 }

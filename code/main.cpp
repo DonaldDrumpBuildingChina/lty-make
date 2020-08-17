@@ -20,7 +20,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
 int main(int argc, char** argv){
-    cout<<"lty-make 基于"<<endl<<GPP_V<<endl<<MAKE_V<<"构建。"<<endl;
+    cout<<"lty-make 基于"<<GPP_V<<"和"<<MAKE_V<<"构建。"<<endl;
     try{
         string *argvs = new string [argc];
         for(int i = 0; i < argc; i++){

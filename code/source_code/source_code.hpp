@@ -18,11 +18,12 @@
 #include <string>
 #include <exception>
 #include <initializer_list>
+#include <map>
 #include "functions.hpp"
 //源代码类
-class source_code
-{
+class source_code{
 private:
+    std::map<std::string, std::pair<std::string, std::string>> compilers;
     std::string filename, name, suffix;
 public:
     source_code(std::string);
