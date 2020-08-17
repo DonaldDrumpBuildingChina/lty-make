@@ -22,6 +22,8 @@ make dist
 make install-require
 ```
 
+### 如何使用lty-make？
+
 一般来说，想要编译一个（单/多文件）项目，只需要运行以下的命令行：
 
 ```
