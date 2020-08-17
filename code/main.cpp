@@ -17,11 +17,12 @@
 #include <cstdio>
 #include <vector>
 #include <iostream>
+#include <string>
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
 string *argvs;
 int main(int argc, char** argv){
-    cout<<"lty-make 基于"<<GPP_V<<"和"<<MAKE_V<<"构建。"<<endl;
+    cout<<"lty-make 基于"<<GCC_V<<"和"<<MAKE_V<<"构建。"<<endl;
     try{
         argvs = new string [argc];
         for(int i = 0; i < argc; i++){

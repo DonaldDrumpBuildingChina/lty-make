@@ -15,7 +15,7 @@
 ######################################################################*/
 #pragma once
 #include "../source_code/source_code.hpp"
-#include "functions.hpp"
+#include "../functions/functions.hpp"
 #include <vector>
 #include <string>
 class platform{

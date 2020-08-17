@@ -1,4 +1,3 @@
 #pragma once
-#define GPP_V "no"
-#define MAKE_V "no"
-//示例：会在make时覆盖
+#define GCC_V "gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) "
+#define MAKE_V "GNU Make 4.1"
