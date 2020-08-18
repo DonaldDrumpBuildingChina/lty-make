@@ -24,6 +24,10 @@ string *argvs;
 extern vector<thread*> threads;
 int main(int argc, char** argv){
     cout<<"lty-make 基于"<<GCC_V<<"和"<<MAKE_V<<"构建。"<<endl;
+    if(getuid()!=0){
+        cerr<<"当前用户不是root用户，你是否忘记了sudo？"<<endl;
+        return 1;
+    }
     try{
         argvs = new string [argc];
         for(int i = 0; i < argc; i++){
@@ -43,7 +47,7 @@ int main(int argc, char** argv){
             dir(argvs[2],compile,(argc == 3)?false:true);
             for(auto it = threads.begin(); it != threads.end(); it++) (*it)->join();
             if(argc != 3 && argc != 4){
-                system("scripts/help.sh");
+                help();
             }
         }else if(argc == 3 && argvs[1] == "set"){
             set(argvs[2].c_str(), argvs[3].c_str());
@@ -52,7 +56,7 @@ int main(int argc, char** argv){
         }else if(argc == 2 && argvs[1] == "remove"){
             system(stringplus((initializer_list<string>){"scripts/install.sh remove", argvs[2]}).c_str());
         }else{
-            system("scripts/help.sh");
+            help();
         }
     }catch(runtime_error x){
         cerr<<x.what()<<endl;
