@@ -40,16 +40,10 @@ int main(int argc, char** argv){
                 system(stringplus((std::initializer_list<std::string>){status.first, source.getName(),\
                 status.second, "-o", argvs[3], "/", source.getsuffix()}).c_str());
             };
-            if(argc == 3){
-                dir(argvs[2],compile,false);
-            }else if(argc == 4){
-                dir(argvs[2],compile,true);
-            }else{
+            dir(argvs[2],compile,(argc == 3)?false:true);
+            for(auto it = threads.begin(); it != threads.end(); it++) (*it)->join();
+            if(argc != 3 && argc != 4){
                 system("scripts/help.sh");
-                return 1;
-            }
-            for(auto it = threads.begin(); it != threads.end(); it++){
-                (*it)->join();
             }
         }else if(argc == 3 && argvs[1] == "set"){
             set(argvs[2].c_str(), argvs[3].c_str());
