@@ -44,15 +44,15 @@ bool source_code::new_file(std::string _filename){
     fstat(fileno(object),&object_time),fclose(object);
     return source_time.st_mtim.tv_nsec>object_time.st_mtim.tv_nsec;
 }
-inline std::string source_code::getName(){
+std::string source_code::getName(){
     return filename;
 }
-inline std::string source_code::getname(){
+std::string source_code::getname(){
     return name;
 }
-inline std::string source_code::getsuffix(){
+std::string source_code::getsuffix(){
     return suffix;
 }
-inline std::string source_code::getObjectName(){
+std::string source_code::getObjectName(){
     return object_name;
 }

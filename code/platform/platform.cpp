@@ -14,7 +14,7 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #include "platform.hpp"
-template <typename T> platform::platform(const T &list){
+platform::platform(const std::vector<std::string> &list){
     for(auto it = list.begin(); it != list.end(); it++){
         files.push_back(*it);
     }
