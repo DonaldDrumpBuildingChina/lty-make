@@ -14,11 +14,6 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #include "header.hpp"
-#include <cstdio>
-#include <vector>
-#include <iostream>
-#include <string>
-#define _CRT_SECURE_NO_WARNINGS
 using namespace std;
 string *argvs;
 extern vector<thread*> threads;
@@ -37,7 +32,7 @@ int main(int argc, char** argv){
             platform pf(forstring(argv[2]));
             pf.all_compile();
             pf.all_link(argvs[3]);
-        }else if(argvs[1] == "dir"){
+        }else if((argc == 3 || argc == 4) && argvs[1] == "dir"){
             auto compile = [](string name){
                 source_code source(name);
                 auto status = source.auto_compile();
@@ -46,9 +41,6 @@ int main(int argc, char** argv){
             };
             dir(argvs[2],compile,(argc == 3)?false:true);
             for(auto it = threads.begin(); it != threads.end(); it++) (*it)->join();
-            if(argc != 3 && argc != 4){
-                help();
-            }
         }else if(argc == 3 && argvs[1] == "set"){
             set(argvs[2].c_str(), argvs[3].c_str());
         }else if(argc == 2 && argvs[1] == "install"){

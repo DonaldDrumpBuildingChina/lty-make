@@ -61,7 +61,7 @@ std::vector<std::string> forstring(std::string str){
 }
 void help(void){
     std::cerr<<"错误：无效的命令行！"<<std::endl;
-    system("cat ../README.md >&2");
+    //system("cat ../README.md >&2");
     exit(1);
 }
 void package(bool flag, std::string name){

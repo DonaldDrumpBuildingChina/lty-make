@@ -23,7 +23,7 @@ std::pair<std::string, std::string> platform::all_compile(){
     std::vector<std::thread*> threads;
     auto lambda = [this](auto it){
         this->last = it->auto_compile();
-        this->objects = stringplus((std::initializer_list<std::string>)\
+        this->objects = stringplus((std::initializer_list<std::string>)
         {objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
     };
     for(auto it = files.begin(); it != files.end(); it++){

@@ -51,3 +51,4 @@ clean:
 	-rm -rf /usr/bin/scripts
 	-rm -rf /lty-make
 	-rm -rf ../lty-make
+	-rm -rf ../gmon.out

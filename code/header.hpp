@@ -18,3 +18,9 @@
 #include "platform/platform.hpp"
 #include "functions/functions.hpp"
 #include "make.hpp"
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <string>
+#include <signal.h>
+#define _CRT_SECURE_NO_WARNINGS
