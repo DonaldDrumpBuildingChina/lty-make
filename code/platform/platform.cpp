@@ -21,9 +21,9 @@ template <typename T> platform::platform(const T &list){
 }
 std::pair<std::string, std::string> platform::all_compile(){
     std::vector<std::thread*> threads;
-    auto lambda = [](auto it){
-        last = it->auto_compile();
-        objects = stringplus((std::initializer_list<std::string>){objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
+    auto lambda = [this](auto it){
+        this->last = it->auto_compile();
+        this->objects = stringplus((std::initializer_list<std::string>){objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
     };
     for(auto it = files.begin(); it != files.end(); it++){
         std::thread* t = new std::thread(lambda,it);

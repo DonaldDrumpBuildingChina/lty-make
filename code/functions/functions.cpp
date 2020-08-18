@@ -27,7 +27,7 @@ void set(std::string name, std::string value){
     setenv(name.c_str(), value.c_str(), 1);
 }
 std::vector<std::thread*> threads;
-std::vector<std::thread*> dir(std::string _dir, void (*word)(std::string), bool r, int depth){
+void dir(std::string _dir, void (*word)(std::string), bool r, int depth){
     DIR* p_dir = NULL;
     struct dirent* p_entry = NULL;
     struct stat statbuf;
@@ -46,7 +46,6 @@ std::vector<std::thread*> dir(std::string _dir, void (*word)(std::string), bool 
     }
     chdir("..");
     closedir(p_dir);
-    return threads;
 }
 std::vector<std::string> forstring(std::string str){
     std::string temp;

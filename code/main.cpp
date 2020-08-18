@@ -21,6 +21,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
 string *argvs;
+extern vector<thread*> threads;
 int main(int argc, char** argv){
     cout<<"lty-make 基于"<<GCC_V<<"和"<<MAKE_V<<"构建。"<<endl;
     try{
@@ -33,7 +34,6 @@ int main(int argc, char** argv){
             pf.all_compile();
             pf.all_link(argvs[3]);
         }else if(argvs[1] == "dir"){
-            std::vector<std::thread*> threads;
             auto compile = [](string name){
                 source_code source(name);
                 auto status = source.auto_compile();
@@ -41,9 +41,9 @@ int main(int argc, char** argv){
                 status.second, "-o", argvs[3], "/", source.getsuffix()}).c_str());
             };
             if(argc == 3){
-                threads = dir(argvs[2],compile,false);
+                dir(argvs[2],compile,false);
             }else if(argc == 4){
-                threads = dir(argvs[2],compile,true);
+                dir(argvs[2],compile,true);
             }else{
                 system("scripts/help.sh");
                 return 1;
