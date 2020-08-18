@@ -24,9 +24,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <thread>
 
 template <typename T>
 std::string stringplus(const T&);
 void set(std::string, std::string);
-void dir(std::string, void (*)(std::string), bool);
+std::vector<std::thread*> dir(std::string, void (*)(std::string), bool, int = 0);
 std::vector<std::string> forstring(std::string);

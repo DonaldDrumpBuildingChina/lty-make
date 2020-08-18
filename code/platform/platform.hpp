@@ -18,11 +18,12 @@
 #include "../functions/functions.hpp"
 #include <vector>
 #include <string>
+#include <thread>
 class platform{
 private:
     std::vector<source_code> files;
     std::string objects;
-    std::pair<std::string, std::string> last;
+    std::pair<std::string, std::string> last; 
 public:
     template <typename T> platform(const T&);
     std::pair<std::string, std::string> all_compile();

@@ -20,11 +20,18 @@ template <typename T> platform::platform(const T &list){
     }
 }
 std::pair<std::string, std::string> platform::all_compile(){
-    for(auto it = files.begin(); it != files.end(); it++){
+    std::vector<std::thread*> threads;
+    auto lambda = [](auto it){
         last = it->auto_compile();
         objects = stringplus((std::initializer_list<std::string>){objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
+    };
+    for(auto it = files.begin(); it != files.end(); it++){
+        std::thread* t = new std::thread(lambda,it);
+    }
+    for(auto it = threads.begin(); it != threads.end(); it++){
+        (*it)->join();
     }    
-    return last;
+    return last; 
 }
 int platform::all_link(std::string target){
     return system(stringplus((std::initializer_list<std::string>){last.first, objects, last.second, "-o", target}).c_str());

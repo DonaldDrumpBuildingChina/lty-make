@@ -16,14 +16,14 @@
 flag = -std=c++11 -Wall -g -p -O3 -static 
 .PHONY: install dist clean init install-require
 lty-make: objects/functions.o objects/platform.o objects/source_code.o objects/main.o 
-	g++ objects/main.o objects/functions.o objects/source_code.o objects/platform.o $(flag) -o ../lty-make
+	g++ objects/*.o $(flag) -o ../lty-make
 objects/functions.o: functions/functions.hpp functions/functions.cpp
 	g++ -c functions/functions.cpp $(flag) -o objects/functions.o
 objects/platform.o: platform/platform.hpp platform/platform.cpp
 	g++ -c platform/platform.cpp $(flag) -o objects/platform.o
 objects/source_code.o: source_code/source_code.hpp source_code/source_code.cpp
 	g++ -c source_code/source_code.cpp $(flag) -o objects/source_code.o
-objects/main.o: header.hpp main.cpp
+objects/main.o: header.hpp make.hpp main.cpp
 	g++ -c main.cpp $(flag) -o objects/main.o
 install:
 	-ln -s `pwd`/lty-make /usr/bin

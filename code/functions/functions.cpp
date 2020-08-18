@@ -26,7 +26,8 @@ template <typename T> std::string stringplus(const T& list){
 void set(std::string name, std::string value){
     setenv(name.c_str(), value.c_str(), 1);
 }
-void dir(std::string _dir, void (*word)(std::string), bool r){
+std::vector<std::thread*> threads;
+std::vector<std::thread*> dir(std::string _dir, void (*word)(std::string), bool r, int depth){
     DIR* p_dir = NULL;
     struct dirent* p_entry = NULL;
     struct stat statbuf;
@@ -37,13 +38,15 @@ void dir(std::string _dir, void (*word)(std::string), bool r){
         if (S_IFDIR & statbuf.st_mode) {
             if (std::string(p_entry->d_name) == "." || std::string(p_entry->d_name) == "..")
                 continue;
-            dir(p_entry->d_name, word, r);
+            dir(p_entry->d_name, word, r, depth+1);
         } else {
-            word(p_entry->d_name);
+            std::thread* t = new std::thread(word, p_entry->d_name);
+            threads.push_back(t);
         }
     }
     chdir("..");
     closedir(p_dir);
+    return threads;
 }
 std::vector<std::string> forstring(std::string str){
     std::string temp;
