@@ -18,6 +18,7 @@ source_code::source_code(std::string _filename){
     filename = _filename;
     name = filename.substr(0, filename.find_last_of(".")+1);
     suffix = filename.substr(filename.find_last_of(".")+1, filename.end()-filename.begin());
+    object_name = stringplus((std::initializer_list<std::string>){"/tmp/", name, ".obj"});
     compilers["c"]=std::pair<std::string, std::string>("gcc", getenv("cflag"));
     compilers["cpp"]=compilers["cxx"]=compilers["C"]=std::pair<std::string, std::string>("g++", getenv("cxxflag"));
     compilers["pas"]=std::pair<std::string, std::string>("gpc", getenv("pasflag"));
@@ -26,18 +27,22 @@ source_code::source_code(std::string _filename){
     compilers["java"]=std::pair<std::string, std::string>("gcj", getenv("javaflag"));
 }
 std::pair<std::string, std::string> source_code::auto_compile(){ 
-    if(new_file("/lty-make/md5sum.txt")==1){
+    if(new_file("/lty-make/md5sum.txt")){
         if(compilers.find(suffix)==compilers.end()){
             throw std::runtime_error("错误：找不到文件类型。");
         }
         system(stringplus((std::initializer_list<std::string>){compilers[suffix].first, "-c",\
         filename, compilers[suffix].second,"-o",\
-        stringplus((std::initializer_list<std::string>){"/tmp/", filename, ".obj"})}).c_str());
+        object_name}).c_str());
     }
     return compilers[suffix];
 }
 bool source_code::new_file(std::string _filename){ 
-    return !system(stringplus((std::initializer_list<std::string>){"scripts/md5sum.sh", _filename, filename}).c_str());
+    struct stat source_time, object_time;
+    FILE *source = fopen(filename.c_str(), "r"), *object = fopen(object_name.c_str(),"r");
+    fstat(fileno(source),&source_time),fclose(source);
+    fstat(fileno(object),&object_time),fclose(object);
+    return source_time.st_mtim.tv_nsec>object_time.st_mtim.tv_nsec;
 }
 inline std::string source_code::getName(){
     return filename;
@@ -47,4 +52,7 @@ inline std::string source_code::getname(){
 }
 inline std::string source_code::getsuffix(){
     return suffix;
+}
+inline std::string source_code::getObjectName(){
+    return object_name;
 }

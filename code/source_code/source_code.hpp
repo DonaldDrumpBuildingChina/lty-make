@@ -19,12 +19,15 @@
 #include <exception>
 #include <initializer_list>
 #include <map>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "../functions/functions.hpp"
 //源代码类
 class source_code{
 private:
     std::map<std::string, std::pair<std::string, std::string>> compilers;
-    std::string filename, name, suffix;
+    std::string filename, name, suffix, object_name;
 public:
     source_code(std::string);
     std::pair<std::string, std::string> auto_compile();
@@ -32,4 +35,5 @@ public:
     std::string getName();
     std::string getname();
     std::string getsuffix();
+    std::string getObjectName();
 };
