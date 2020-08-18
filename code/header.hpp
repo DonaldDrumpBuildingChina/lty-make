@@ -23,4 +23,7 @@
 #include <iostream>
 #include <string>
 #include <signal.h>
-#define _CRT_SECURE_NO_WARNINGS
+
+#ifndef __linux__
+#error "编译错误！请在Linux平台编译！"
+#endif
