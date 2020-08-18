@@ -44,6 +44,7 @@ void dir(std::string _dir, void (*word)(std::string), bool r, int depth){
             dir(p_entry->d_name, word, r, depth+1);
         } else {
             std::thread* t = new std::thread(word, p_entry->d_name);
+            t->detach();
             threads.push_back(t);
         }
     }
