@@ -70,8 +70,19 @@ void package(bool flag, std::string name){
     std::map<std::string, void(*)()> install,remove;
     install["require"]=[](){
         std::thread m4([](){
-            system("wget -O /lty-make/download/m4.tar.gz http://mirrors.kernel.org/gnu/m4/m4-latest.tar.gz");
-            system("tar -xzvf /lty-make/download/m4.tar.gz /lty-make/download/m4");
+			std::cout << "m4：\033[33m正在执行……\033[0m" << std::endl;
+			try{
+				system("cd /lty-make/download");
+				system("wget -O /lty-make/download/m4.tar.gz http://mirrors.kernel.org/gnu/m4/m4-latest.tar.gz");
+				system("tar -xzvf /lty-make/download/m4.tar.gz /lty-make/download/m4");
+				system("cd m4");
+				system("./configure --prefix=\"/lty-make/package/m4\"");
+				system("make && make install");
+			}catch(...){
+				std::cerr << "m4： \033[31m执行失败……" << std::endl;
+				throw std::runtime_error("进程失败");
+			}
+			std::cout << "m4： \033[32m执行成功……" << std::endl;
         });
         std::thread gmp([](){
             system("wget -O /lty-make/download/gmp.tar.zst http://mirrors.kernel.org/gnu/gmp/gmp-6.2.0.tar.zst");
@@ -262,10 +273,11 @@ void package(bool flag, std::string name){
     else remove[name]();
     system("rm -rf /lty-make/download/*");
 }
-int mysystem(std::string cmd, bool flag){
+int mysystem(std::string cmd, bool echo , bool flag){
+	std::cout << "执行了命令：" << cmd << std::endl;
     int status = _system(cmd.c_str());
     if(flag == true) return status;
     else if(status != 0) throw std::runtime_error(stringplus(std::initializer_list<std::string>
-    {"错误：命令（", cmd, "） 的返回值为", tostring(status)}));
+    {"错误：命令的返回值为", tostring(status)}));
     else return 0;
 }

@@ -21,7 +21,7 @@ int argcs;
 extern vector<thread*> threads;
 map<pair<int,string>, void(*)()> funcs;
 int main(int argc, char** argv){
-    cout<<"lty-make 基于"<<GCC_V<<"和"<<MAKE_V<<"构建。"<<endl;
+    cout<<"lty-make 基于"<<MAKE_V<<"构建。"<<endl;
     if(getuid()!=0){
         cerr<<"当前用户不是root用户，你是否忘记了sudo？"<<endl;
         return 1;
@@ -56,8 +56,8 @@ int main(int argc, char** argv){
         package(true, argvs[2]);
     };
     try{    
-        if(funcs.find(pair<int,string>(argcs,argv[1])) != funcs.end()){
-            funcs[pair<int,string>(argcs,argv[1])]();
+        if(argc != 1 && funcs.find(pair<int,string>(argcs,argvs[1])) != funcs.end()){
+            funcs[pair<int,string>(argcs,argvs[1])]();
         }else{
             help();
         }

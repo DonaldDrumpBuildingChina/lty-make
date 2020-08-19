@@ -13,7 +13,7 @@
 #                                                                    #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################
-flag = -std=c++14 -Wall -g -p -O3 -static -Wno-unused-result -Werror -Wshadow -lpthread \
+flag = -std=c++14 -Wall -g -p -O3 -static -Wno-catch-value -Wno-unused-result -Werror -Wshadow -lpthread \
  -Wpointer-arith -Wunreachable-code -Wcast-align -Wundef -Wredundant-decls 
 .PHONY: install dist clean init install-require
 lty-make: objects/functions.o objects/platform.o objects/source_code.o objects/main.o 
@@ -37,8 +37,8 @@ init:
 	@-mkdir /lty-make/package
 	@-mkdir objects
 	@echo "#pragma once" > make.hpp
-	@g++ -v 2> tmp
-	@echo "#define GCC_V \"`sed -n '9p' < tmp`\"" >> make.hpp 
+	# @g++ -v 2> tmp
+	# @echo "#define GCC_V \"`sed -n '9p' < tmp`\"" >> make.hpp 
 	@make -v > tmp
 	@echo "#define MAKE_V \"`head -n 1 tmp`\"" >> make.hpp
 	@rm -rf tmp 
