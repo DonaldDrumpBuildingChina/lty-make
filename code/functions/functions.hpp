@@ -30,7 +30,7 @@
 
 #define system mysystem
 
-template <typename T> std::string stringplus(const T&);
+template <typename T> std::string stringplus(const T&, bool = true);
 void set(std::string, std::string);
 void dir(std::string, void (*)(std::string), bool, int = 0);
 std::vector<std::string> forstring(std::string);

@@ -14,9 +14,9 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #include "functions.hpp"
-template <typename T> std::string stringplus(const T& list){
+template <typename T> std::string stringplus(const T& list, bool flag){
     std::string tmp;
-    for (auto it = list.begin(); it != list.end(); it++) tmp+=*it,tmp+=" ";
+    for (auto it = list.begin(); it != list.end(); it++) tmp+=*it,tmp+=(flag == true)?" ":"";
     return tmp;
 }
 template <typename T> std::string tostring(const T& n){
@@ -67,79 +67,27 @@ void help(void){
 }
 void package(bool flag, std::string name){
     std::map<std::string, void(*)()> install,remove;
+	static auto lambda = [](std::string name, std::string tar, std::string flag = "tar -xzvf"){
+		auto str = stringplus((std::initializer_list<std::string>){"\t", name, "："}).c_str();
+		std::cout << name << "：\033[33m正在执行……\033[0m" << std::endl;
+		system(stringplus((std::initializer_list<std::string>){"wget -O /lty-make/download/", name, ".tar.gz", " ", tar}, false).c_str(), str);
+		system(stringplus((std::initializer_list<std::string>){flag, " /lty-make/download/", name, ".tar.gz /lty-make/download/", name}, false).c_str(), str);
+		system(stringplus((std::initializer_list<std::string>){"cd /lty-make/download/", name}, false).c_str(), str);
+		system(stringplus((std::initializer_list<std::string>){"./configure --prefix=\"/lty-make/package/", name}).c_str(), str);
+		system("make && make install", str);
+		std::cout << "\033[32m执行成功\033[0m" << std::endl;
+		_exit(0);
+	};
     install["require"]=[](){
 		std::vector<std::thread> threads;
-        threads.push_back(std::thread([](){
-			std::cout << "m4：\033[33m正在执行……\033[0m" << std::endl;
-			system("wget -O /lty-make/download/m4.tar.gz http://mirrors.kernel.org/gnu/m4/m4-latest.tar.gz", "\tm4：");
-			system("tar -xzvf /lty-make/download/m4.tar.gz /lty-make/download/m4", "\tm4：");
-			system("cd /lty-make/download/m4", "\tm4：");
-			system("./configure --prefix=\"/lty-make/package/m4\"","\tm4：");
-			system("make && make install", "\tm4：");
-			std::cout << "m4： \033[32m执行成功" << std::endl;
-        }));
-        threads.push_back(std::thread([](){
-			std::cout << "gmp：\033[33m正在执行……\033[0m" << std::endl;
-            system("wget -O /lty-make/download/gmp.tar.zst http://mirrors.kernel.org/gnu/gmp/gmp-6.2.0.tar.zst","\tgmp：");
-            system("tar -I zstd -xvf gmp.tar.zst /lty-make/doenload/gmp","\tgmp：");
-			system("cd /lty-make/download/gmp", "\tgmp：");
-			system("./configure --prefix=\"/lty-make/package/gmp\"", "\tgmp：");
-			system("make && make install", "\tgmp：");
-			std::cout << "gmp：\033[32m执行成功\033[0m" << std::endl;
-        }));
-        threads.push_back(std::thread([](){
-			std::cout << "mpfr：\033[33m开始执行……\033[0m" << std::endl;
-            system("wget -O /lty-make/download/mpfr.tar.gz http://mirrors.kernel.org/gnu/mpfr/mpfr-4.1.0.tar.gz", "\tmpfr：");
-            system("tar -xzvf /lty-make/download/mpfr.tar.gz /lty-make/download/mpfr", "\tmpfr：");
-			system("cd /lty-make/download/mpfr", "\tmpfr：");
-			system("./configure --prefix=\"/lty-make/package/mpfr\"", "\tmpfr：");
-			system("make && make install", "\tmpfr：");
-			std::cout << "mpfr：\033[32m执行成功\033[0m" << std::endl;
-        }));
-        threads.push_back(std::thread([](){
-            std::cout << "\033[33m开始执行……\033[0m" << std::endl;
-			system("wget -O /lty-make/download/mpc.tar.gz http://mirrors.kernel.org/gnu/mpc/mpc-1.0.1.tar.gz", "\tmpc：");
-            system("tar -xzvf /lty-make/download/mpc.tar.gz /lty-make/download/mpc", "\tmpc：");
-			system("cd /lty-make/download/mpc", "\tmpc：");
-			system("./configure --prefix=\"/lty-make/package/mpc\"", "\tmpc：");
-			system("make && make install", "\tmpc：");
-			std::cout << "mpfr：\033[32m执行成功\033[0m" << std::endl;
-        }));
-        threads.push_back(std::thread([](){
-			std::cout << "apr：\033[33m正在执行……\033[0m" << std::endl;
-            system("wget -O /lty-make/download/apr.tar.gz http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz", "\tapr：");
-            system("tar -xzvf /lty-make/download/apr.tar.gz /lty-make/download/apr", "\tapr：");
-			system("cd /lty-make/download/apr", "\tapr：");
-			system("./configure --prefix=\"/lty-make/package/apr\"", "\tapr：");
-			system("make && make install", "\tapr：");
-			std::cout << "apr：\033[32m执行成功\033[0m" << std::endl;
-        }));
-        threads.push_back(std::thread([](){
-			std::cout << "apr-utill：\033[33m正在执行\032[0m" << std::endl;
-            system("wget -O /lty-make/download/apr-utill.tar.gz http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz", "\tapr-utill：");
-            system("tar -xzvf /lty-make/download/apr-utill.tar.gz /lty-make/download/apr-utill", "\tapr-utill：");
-			system("cd /lty-make/download/apr-utill", "\tapr-utill：");
-			system("./configure --prefix=\"/lty-make/package/apr-utill\"", "\tapr-utill：");
-			system("make && make install", "\tapr-utill：");
-			std::cout << "apr-utill：\033[32m执行成功\033[0m" << std::endl;
-        }));
-        threads.push_back(std::thread([](){
-			std::cout << "pcre：\033[33m正在执行……" << std::endl;
-            system("wget -O /lty-make/download/pcre.zip http://jaist.dl.sourceforge.net/project/pcre/pcre/8.10/pcre-8.10.zip", "\tpcre：");
-            system("unzip /lty-make/download/pcre.zip -d /lty-make/download/pcre", "\t pcre：");
-			system("cd /lty-make/download/pcre", "\tpcre：");
-			system("./configure --prefix=\"/lty-make/package/pcre\"", "\tpcre：");
-			system("make && make install", "\tpcre：");
-			std::cout << "pcre：\033[32m执行成功\033[0m" << std::endl;
-        }));
-        threads.push_back(std::thread([](){
-			std::cout << "boost：\033[33m正在执行……\033[0m" << std::endl;
-            system("wget -O /lty-make/download/boost.tar.gz http://www.sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz", "\tboost：");
-			system("tar -xzvf /lty-make/download/boost.tar.gz /lty-make/download/boost", "\tboost：");
-			system("cd /lty-make/download/boost", "\tboost：");
-			system("./configure --prefix=\"/lty-make/package/boost\"", "\tboost：");
-			system("make && make install", "\tboost：");
-		}));
+        threads.push_back(std::thread(lambda, "m4", "http://mirrors.kernel.org/gnu/m4/m4-lastest.tar.gz"));
+		threads.push_back(std::thread(lambda, "gmp", "http://mirrors.kernel.org/gnu/gmp/gmp-6.2.0.tar.zst", "tar -I zstd -xvf "));
+		threads.push_back(std::thread(lambda, "mpfr", "http://mirrors.kernel.org/gnu/mpfr/mpfr-4.1.0.tar.gz"));
+		threads.push_back(std::thread(lambda, "mpc", "http://mirrors.kernel.org/gnu/mpc/mpc-1.0.1.tar.gz"));
+		threads.push_back(std::thread(lambda, "apr", "http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz"));
+		threads.push_back(std::thread(lambda, "apr-utill", "http://archive.apache.org/dist/apr/apr-utill-1.3.12.tar.gz"));
+		threads.push_back(std::thread(lambda, "pcre", "http://jaist.dl.sourceforge.net/project/pcre/pcre/8.10/pcre-8.10.zip", "unzip -d"));
+		threads.push_back(std::thread(lambda, "boost", "http://www.sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz"));
 		for(auto it = threads.begin(); it != threads.end(); it++) it->detach();
 		for(auto it = threads.begin(); it != threads.end(); it++) it->join();
 	};
