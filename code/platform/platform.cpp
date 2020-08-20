@@ -19,7 +19,7 @@ platform::platform(const std::vector<std::string> &list){
         files.push_back(*it);
     }
 }
-std::pair<std::string, std::string> platform::all_compile(){
+void platform::all_compile(){
     std::vector<std::thread*> threads;
     auto lambda = [this](auto it){
         this->last = it->auto_compile();
@@ -34,8 +34,7 @@ std::pair<std::string, std::string> platform::all_compile(){
     for(auto it = threads.begin(); it != threads.end(); it++){
         (*it)->join();
     }    
-    return last; 
 }
 int platform::all_link(std::string target){
-    return system(stringplus((std::initializer_list<std::string>){last.first, objects, last.second, "-o", target}).c_str());
+    return system(stringplus((std::initializer_list<std::string>){"gcc", objects, getenv("gccflag"), "-o", target}).c_str());
 }

@@ -28,8 +28,7 @@
 #include <iostream>
 #include <map>
 
-#define system(x) mysystem(x)
-#define _system(x) system(x)
+#define system mysystem
 
 template <typename T> std::string stringplus(const T&);
 void set(std::string, std::string);
@@ -37,6 +36,6 @@ void dir(std::string, void (*)(std::string), bool, int = 0);
 std::vector<std::string> forstring(std::string);
 void help(void);
 void package(bool, std::string);
-int mysystem(std::string, bool = true, bool = false);
+int mysystem(std::string, std::string = "",  bool = true, bool = false);
 template <typename T> std::string tostring(const T&);
 

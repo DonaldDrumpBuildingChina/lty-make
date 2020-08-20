@@ -26,6 +26,6 @@ private:
     std::pair<std::string, std::string> last; 
 public:
     platform(const std::vector<std::string>&);
-    std::pair<std::string, std::string> all_compile();
+    void all_compile();
     int all_link(std::string);
 };

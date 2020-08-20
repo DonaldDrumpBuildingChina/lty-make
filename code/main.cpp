@@ -39,9 +39,8 @@ int main(int argc, char** argv){
     funcs[pair<int,string>(3, "dir")]=funcs[pair<int,string>(4, "dir")]=[](){
         auto compile = [](string name){
             source_code source(name);
-            auto status = source.auto_compile();
-            system(stringplus((std::initializer_list<std::string>){status.first, source.getName(),\
-            status.second, "-o", argvs[3], "/", source.getsuffix()}).c_str());
+            source.auto_compile();
+            system(stringplus((std::initializer_list<std::string>){"gcc", source.getName(),getenv("gccflag"), "-o", argvs[3], "/", source.getsuffix()}).c_str());
         };
         dir(argvs[2],compile,(argcs == 3)?false:true);
         for(auto it = threads.begin(); it != threads.end(); it++) (*it)->join();
@@ -62,10 +61,7 @@ int main(int argc, char** argv){
             help();
         }
     }catch(runtime_error x){
-        cerr<<x.what()<<endl;
-        return 1;
-    }catch(...){
-        cerr<<"未知错误！"<<endl;
+        cerr<<"\033[31m"<<x.what()<<"\033[0m"<<endl;
         return 1;
     }
     cout<<"运行完毕。"<<endl;

@@ -31,7 +31,7 @@ private:
 public:
     source_code(std::string);
     std::pair<std::string, std::string> auto_compile();
-    bool new_file(std::string);
+    bool new_file();
     std::string getName();
     std::string getname();
     std::string getsuffix();

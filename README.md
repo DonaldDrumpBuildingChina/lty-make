@@ -19,7 +19,6 @@ make clean && make init
 
 ```
 make dist
-make install-require
 ```
 
 ### 如何使用lty-make？
@@ -30,18 +29,12 @@ make install-require
 # lty-make auto "main.cpp hello.cpp" "../hello.out"
 ```
 
-判断项目类型（C或C++）是以最后一个项目的后缀名为准。
-
-自动编译不会支持Python，因为Python没有编译器，不会生成目标文件。
-
 如果想要修改默认的编译参数，请这样做：
 
 ```
-# lty-make set cflag 'C编译参数'
-# lty-make set cxxflag 'C++编译参数'
-# lty-make set pasflag 'Pascal编译参数'
-# lty-make set forflag 'Fortran编译参数'
+# lty-make set gccflag '编译参数'
 ```
+注意：目前支持GCC编译器支持的所有语言，并且支持多语言编译！
 
 如果你有一个文件夹的单文件项目，试试这个：
 
@@ -61,22 +54,6 @@ make install-require
 # lty-make install "require"
 # lty-make remove "c++"
 ```
-
-提示：这是实验性功能，编译器安装后会覆盖任何未安装的编译器，请谨慎使用。
-
-由于C,C++,Fortran,Pascal的编译器都属于gcc的一部分，所以删除其中任何一个都会删除所有的gcc。
-
-一个更稳妥的方式：
-```
-# lty-make install "gcc"
-# lty-make remove "gcc"
-```
-
-试试改成`c`,`c++`,`fortran`,`pascal`,`bash`,`git`,`python`,`apache`,`php`,`mysql`,`nginx`!!!（注意，需要先安装依赖）
-
-同时我们允许自动将一些未经修改的的项目保留，并支持更多语言！
-
-欢迎提交工单/推送请求，注意命令行的顺序（不要颠倒）。
 
 仓库作者授权任何人对代码进行任何操作。许可证：
 ```

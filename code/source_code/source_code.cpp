@@ -18,26 +18,13 @@ source_code::source_code(std::string _filename){
     filename = _filename;
     name = filename.substr(0, filename.find_last_of(".")+1);
     suffix = filename.substr(filename.find_last_of(".")+1, filename.end()-filename.begin());
-    object_name = stringplus((std::initializer_list<std::string>){"/tmp/", name, ".obj"});
-    compilers["c"]=std::pair<std::string, std::string>("gcc", getenv("cflag"));
-    compilers["cpp"]=compilers["cxx"]=compilers["C"]=std::pair<std::string, std::string>("g++", getenv("cxxflag"));
-    compilers["pas"]=std::pair<std::string, std::string>("gpc", getenv("pasflag"));
-    compilers["f90"]=compilers["f95"]=compilers["f"]=compilers["for"]=\
-    std::pair<std::string, std::string>("gfortran", getenv("forflag"));
-    compilers["java"]=std::pair<std::string, std::string>("gcj", getenv("javaflag"));
 }
 std::pair<std::string, std::string> source_code::auto_compile(){ 
-    if(new_file("/lty-make/md5sum.txt")){
-        if(compilers.find(suffix)==compilers.end()){
-            throw std::runtime_error("错误：找不到文件类型。");
-        }
-        system(stringplus((std::initializer_list<std::string>){compilers[suffix].first, "-c",\
-        filename, compilers[suffix].second,"-o",\
-        object_name}).c_str());
+    if(new_file()){
+        system(stringplus((std::initializer_list<std::string>{"gcc -c",filename, getenv("gccflag") ,"-o", object_name})).c_str());
     }
-    return compilers[suffix];
 }
-bool source_code::new_file(std::string _filename){ 
+bool source_code::new_file(){ 
     struct stat source_time, object_time;
     FILE *source = fopen(filename.c_str(), "r"), *object = fopen(object_name.c_str(),"r");
     fstat(fileno(source),&source_time),fclose(source);
