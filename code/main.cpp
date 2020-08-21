@@ -23,7 +23,8 @@ map<pair<int,string>, void(*)()> funcs;
 int main(int argc, char** argv){
     cout<<"lty-make 基于"<<MAKE_V<<"构建。"<<endl;
     if(getuid()!=0){
-        cerr<<"当前用户不是root用户，你是否忘记了sudo？"<<endl;
+      
+  cerr<<"当前用户不是root用户，你是否忘记了sudo？"<<endl;
         return 1;
     }
     argcs = argc;
@@ -36,11 +37,19 @@ int main(int argc, char** argv){
         pf.all_compile();
         pf.all_link(argvs[3]);
     };
+	funcs[pair<int,string>(2, "only-compile")]=[](){
+		platform pf(forstring(argvs[2]));
+		pf.all_compile();	
+	};
+	funcs[pair<int,string>(3, "only-link")]=[](){
+		platform pf(forstring(argvs[2]));
+		pf.all_link(argvs[3]);	
+	};
     funcs[pair<int,string>(3, "dir")]=funcs[pair<int,string>(4, "dir")]=[](){
-        auto compile = [](string name){
+        static auto compile = [](string name){
             source_code source(name);
             source.auto_compile();
-            system(stringplus((std::initializer_list<std::string>){"gcc", source.getName(),getenv("gccflag"), "-o", argvs[3], "/", source.getsuffix()}).c_str());
+            system(stringplus((std::initializer_list<std::string>){"gcc", source.getName(),getenv("gccflag"), "-o", argvs[3], "/", source.getName()}).c_str());
         };
         dir(argvs[2],compile,(argcs == 3)?false:true);
         for(auto it = threads.begin(); it != threads.end(); it++) (*it)->join();
@@ -54,6 +63,13 @@ int main(int argc, char** argv){
     funcs[pair<int,string>(2, "remove")]=[](){
         package(true, argvs[2]);
     };
+	funcs[pair<int,string>(3, "run")]=[](){
+		system(stringplus((initializer_list<string>){argvs[2], argvs[3]}), "",false, false);
+	};
+	funcs[pair<int,string>(3, "run-code")]=[](){
+		system(stringplus((initializer_list<std::string>){"lty-make auto \"", argvs[2], "\" /tmp/temp_code"}, false).c_str(), "", false, false);
+		system(stringplus((initializer_list<string>){"/tmp/temp_code", argvs[3]}).c_str(), "", false, false);
+	};
     try{    
         if(argc != 1 && funcs.find(pair<int,string>(argcs,argvs[1])) != funcs.end()){
             funcs[pair<int,string>(argcs,argvs[1])]();

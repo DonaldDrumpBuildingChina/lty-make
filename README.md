@@ -58,6 +58,15 @@ lty-make remove "gcc" # 移除gcc包
 
 注意：编译器都是来自`gcc`，所以使用`gcc`代表所有编译器。
 
+还可以进行高级编译！
+
+```
+lty-make only-compile "hello.cpp main.cpp" # 只编译，节省时间
+lty-make only-link "hello.cpp main.cpp" "a.out" # 只链接
+lty-make run "echo" "hello, world" # 运行命令
+lty-make run-code "main.cpp" # 直接运行项目
+```
+
 仓库作者授权任何人对代码进行任何操作。许可证：
 ```
             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
