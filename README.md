@@ -5,20 +5,20 @@
 如果你是第一次使用，请使用这些：
 
 ```
-sudo su root
-make init && make && make install
+sudo su root # 切换到root用户
+make init && make && make install # 初始化，编译，安装
 ```
 
 如果你已经成功构建过一次，请使用这些清除：
 
 ```
-make clean && make init
+make clean && make init # 清理并初始化
 ```
 
 这里还有别的工具：
 
 ```
-make dist
+make dist # 打包到../lty-make.tar.gz
 ```
 
 ### 如何使用lty-make？
@@ -26,34 +26,37 @@ make dist
 一般来说，想要编译一个（单/多文件）项目，只需要运行以下的命令行：
 
 ```
-# lty-make auto "main.cpp hello.cpp" "../hello.out"
+lty-make auto "main.cpp hello.cpp" "../hello.out" # 将main.cpp hello.cpp作为一个项目编译为../hello.out
+lty-make auto *.cpp a.out # 将目录下的所有cpp文件作为一个项目编译到a.out
 ```
 
 如果想要修改默认的编译参数，请这样做：
 
 ```
-# lty-make set gccflag '编译参数'
+lty-make set gccflag '编译参数' # 将被扩展为gcc (-c xxx) $gccflag -o xxx 
 ```
 注意：目前支持GCC编译器支持的所有语言，并且支持多语言编译！
 
 如果你有一个文件夹的单文件项目，试试这个：
 
 ```
-# lty-make dir "code" "../"
+lty-make dir "code" "../" # 表示将文件夹下的所有文件作为单文件项目输出
 ```
 
 你甚至可以规定是否递归！试试这个：
 
 ```
-# lty-make dir "code" "../" -r
+lty-make dir "code" "../" -r # 递归遍历目录
 ```
 
 新增加的功能：多编译器安装！
 
 ```
-# lty-make install "require"
-# lty-make remove "c++"
+lty-make install "require" # 安装依赖
+lty-make remove "gcc" # 移除gcc包
 ```
+
+注意：编译器都是来自`gcc`，所以使用`gcc`代表所有编译器。
 
 仓库作者授权任何人对代码进行任何操作。许可证：
 ```

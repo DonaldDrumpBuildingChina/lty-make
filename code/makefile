@@ -13,8 +13,7 @@
 #                                                                    #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################
-flag = -std=c++14 -Wall -g -p -O3 -static -Wno-catch-value -Wno-unused-result -Werror -Wshadow -lpthread -Wno-nonnull \
- -Wpointer-arith -Wunreachable-code -Wcast-align -Wundef -Wredundant-decls -Wno-shadow -Wno-return-type
+flag = -std=c++17 -Wall -g -p -O3 -static -lpthread
 .PHONY: install dist clean init install-require
 lty-make: objects/functions.o objects/platform.o objects/source_code.o objects/main.o 
 	g++ objects/*.o $(flag) -o ../lty-make

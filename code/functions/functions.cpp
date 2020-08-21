@@ -66,7 +66,7 @@ void help(void){
     exit(1);
 }
 void package(bool flag, std::string name){
-    std::map<std::string, void(*)()> install,remove;
+    std::map<std::string, void(*)()> install;
 	static auto lambda = [](std::string name, std::string tar, std::string flag = "tar -xzvf"){
 		auto str = stringplus((std::initializer_list<std::string>){"\t", name, "："}).c_str();
 		std::cout << name << "：\033[33m正在执行……\033[0m" << std::endl;
@@ -77,6 +77,17 @@ void package(bool flag, std::string name){
 		system("make && make install", str);
 		std::cout << "\033[32m执行成功\033[0m" << std::endl;
 		_exit(0);
+	};
+	static auto lremove = [](std::string name){
+		system(stringplus((std::initializer_list<std::string>){"rm -rf /lty-make/package/", name}, false), "", false);
+	};
+	static auto remove = [lremove](std::string name){
+		if(name == "require"){
+			lremove("m4"),lremove("gmp"),lremove("mpfr"),
+			lremove("mpc"),lremove("apr"),lremove("apr-utill"),
+			lremove("pcre"),lremove("boost");return;
+		}
+		lremove(name);
 	};
     install["require"]=[](){
 		std::vector<std::thread> threads;
@@ -180,36 +191,8 @@ void package(bool flag, std::string name){
             system("make && make install");
             system("nginx start");
     };
-    remove["require"]=[](){
-        system("rm -rf /lty-make/package/m4");
-        system("rm -rf /lty-make/package/gmp");
-        system("rm -rf /lty-make/package/mpfr");
-        system("rm -rf /lty-make/package/mpc");
-        system("rm -rf /lty-make/package/apr");
-        system("rm -rf /lty-make/package/apr-utils");
-        system("rm -rf /lty-make/package/pcre");
-        system("rm -rf /lty-make/package/boost");
-    };
-    remove["c"]=remove["c++"]=remove["pascal"]=remove["fortran"]=remove["gcc"]=[](){
-        system("rm -rf /lty-make/package/gcc");
-    };
-    remove["make"]=[](){
-        system("rm -rf /lty-make/package/make");
-    };
-    remove["bash"]=[](){
-        system("rm -rf /lty-make/package/bash");
-    };
-    remove["python"]=[](){
-        system("rm -rf /lty-make/package/python");
-    };
-    remove["apache"]=[](){
-        system("rm -rf /lty-make/package/apache");
-    };
-    remove["nginx"]=[](){
-        system("rm -rf /lty-make/package/nginx");
-    };
     if(flag == false) install[name]();
-    else remove[name]();
+    else remove(name);
     system("rm -rf /lty-make/download/*");
 }
 int mysystem(std::string cmd, std::string before, bool echo , bool flag){
