@@ -28,7 +28,6 @@ void platform::all_compile(){
     };
     for(auto it = files.begin(); it != files.end(); it++){
         std::thread* t = new std::thread(lambda,it);
-        t->detach();
         threads.push_back(t);
     }
     for(auto it = threads.begin(); it != threads.end(); it++){

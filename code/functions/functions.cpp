@@ -44,7 +44,6 @@ void dir(std::string _dir, void (*word)(std::string), bool r, int depth){
             dir(p_entry->d_name, word, r, depth+1);
         } else {
             std::thread* t = new std::thread(word, p_entry->d_name);
-            t->detach();
             threads.push_back(t);
         }
     }
@@ -99,7 +98,6 @@ void package(bool flag, std::string name){
 		threads.push_back(std::thread(lambda, "apr-utill", "http://archive.apache.org/dist/apr/apr-utill-1.3.12.tar.gz"));
 		threads.push_back(std::thread(lambda, "pcre", "http://jaist.dl.sourceforge.net/project/pcre/pcre/8.10/pcre-8.10.zip", "unzip -d"));
 		threads.push_back(std::thread(lambda, "boost", "http://www.sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz"));
-		for(auto it = threads.begin(); it != threads.end(); it++) it->detach();
 		for(auto it = threads.begin(); it != threads.end(); it++) it->join();
 	};
     install["mysql"]=[](){
