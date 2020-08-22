@@ -14,17 +14,26 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #include "platform.hpp"
-template <typename T> platform::platform(const T&){
+platform::platform(const std::vector<std::string> &list){
     for(auto it = list.begin(); it != list.end(); it++){
         files.push_back(*it);
     }
 }
 void platform::all_compile(){
+    std::vector<std::thread*> threads;
+    auto lambda = [this](auto it){
+        this->last = it->auto_compile();
+        this->objects = stringplus((std::initializer_list<std::string>)
+        {objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
+    };
     for(auto it = files.begin(); it != files.end(); it++){
-        last = it->auto_compile();
-        objects = stringplus((std::initializer_list<std::string>){objects,stringplus((std::initializer_list<std::string>){"/tmp/", it->getName(), ".obj"})});
+        std::thread* t = new std::thread(lambda,it);
+        threads.push_back(t);
+    }
+    for(auto it = threads.begin(); it != threads.end(); it++){
+        (*it)->join();
     }    
 }
 int platform::all_link(std::string target){
-    return system(stringplus((std::initializer_list<std::string>){"ld", objects, getenv("ldflags"), "-lstdc++ -lm -o", target}).c_str());
+    return system(stringplus((std::initializer_list<std::string>){"gcc", objects, getenv("gccflag"), "-o", target}).c_str());
 }

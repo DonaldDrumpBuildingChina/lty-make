@@ -18,3 +18,12 @@
 #include "platform/platform.hpp"
 #include "functions/functions.hpp"
 #include "make.hpp"
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <string>
+#include <signal.h>
+
+#ifndef __linux__
+#error "编译错误！请在Linux平台编译！"
+#endif

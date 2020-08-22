@@ -14,45 +14,70 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.                         #
 ######################################################################*/
 #include "header.hpp"
-#include <cstdio>
-#include <vector>
-#include <iostream>
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
+string *argvs;
+int argcs;
+extern vector<thread*> threads;
+map<pair<int,string>, void(*)()> funcs;
 int main(int argc, char** argv){
-    cout<<"lty-make 基于"<<endl<<GPP_V<<endl<<MAKE_V<<"构建。"<<endl;
-    try{
-        string *argvs = new string [argc];
-        for(int i = 0; i < argc; i++){
-            argvs[i] = string(argv[i]);
-        }
-        if(argc == 3 && argvs[1] == "auto"){
-            platform pf(forstring(argv[2]));
-            pf.all_compile();
-            pf.all_link(argvs[3]);
-        }else if(argvs[1] == "dir"){
-            auto compile = [](string name){};
-            if(argc == 3){
-                dir(argvs[2],compile,false);
-            }else if(argc == 4){
-                dir(argvs[2],compile,true);
-            }else{
-                system("scripts/help.sh");
-            }
-        }else if(argc == 3 && argvs[1] == "set"){
-            set(argvs[2].c_str(), argvs[3].c_str());
-        }else if(argc == 2 && argvs[1] == "install"){
-            system(stringplus((initializer_list<string>){"scripts/install.sh install", argvs[2]}).c_str());
-        }else if(argc == 2 && argvs[1] == "remove"){
-            system(stringplus((initializer_list<string>){"scripts/install.sh remove", argvs[2]}).c_str());
+    cout<<"lty-make 基于"<<MAKE_V<<"构建。"<<endl;
+    if(getuid()!=0){
+      
+  cerr<<"当前用户不是root用户，你是否忘记了sudo？"<<endl;
+        return 1;
+    }
+    argcs = argc;
+    argvs = new string [argc];
+    for(int i = 0; i < argc; i++){
+        argvs[i] = string(argv[i]);
+    }
+    funcs[pair<int,string>(3, "auto")]=[](){
+        platform pf(forstring(argvs[2]));
+        pf.all_compile();
+        pf.all_link(argvs[3]);
+    };
+	funcs[pair<int,string>(2, "only-compile")]=[](){
+		platform pf(forstring(argvs[2]));
+		pf.all_compile();	
+	};
+	funcs[pair<int,string>(3, "only-link")]=[](){
+		platform pf(forstring(argvs[2]));
+		pf.all_link(argvs[3]);	
+	};
+    funcs[pair<int,string>(3, "dir")]=funcs[pair<int,string>(4, "dir")]=[](){
+        static auto compile = [](string name){
+            source_code source(name);
+            source.auto_compile();
+            system(stringplus((std::initializer_list<std::string>){"gcc", source.getName(),getenv("gccflag"), "-o", argvs[3], "/", source.getName()}).c_str());
+        };
+        dir(argvs[2],compile,(argcs == 3)?false:true);
+        for(auto it = threads.begin(); it != threads.end(); it++) (*it)->join();
+    };
+    funcs[pair<int,string>(3, "set")]=[](){
+        set(argvs[2].c_str(), argvs[3].c_str());
+    };
+    funcs[pair<int,string>(2, "install")]=[](){
+        package(false, argvs[2]);
+    };
+    funcs[pair<int,string>(2, "remove")]=[](){
+        package(true, argvs[2]);
+    };
+	funcs[pair<int,string>(3, "run")]=[](){
+		system(stringplus((initializer_list<string>){argvs[2], argvs[3]}), "",false, false);
+	};
+	funcs[pair<int,string>(3, "run-code")]=[](){
+		system(stringplus((initializer_list<std::string>){"lty-make auto \"", argvs[2], "\" /tmp/temp_code"}, false).c_str(), "", false, false);
+		system(stringplus((initializer_list<string>){"/tmp/temp_code", argvs[3]}).c_str(), "", false, false);
+	};
+    try{    
+        if(argc != 1 && funcs.find(pair<int,string>(argcs,argvs[1])) != funcs.end()){
+            funcs[pair<int,string>(argcs,argvs[1])]();
         }else{
-            system("scripts/help.sh");
+            help();
         }
     }catch(runtime_error x){
-        cerr<<x.what()<<endl;
-        return 1;
-    }catch(...){
-        cerr<<"未知错误！"<<endl;
+        cerr<<"\033[31m"<<x.what()<<"\033[0m"<<endl;
         return 1;
     }
     cout<<"运行完毕。"<<endl;
@@ -154,4 +179,54 @@ int main(int argc, char** argv){
 #                       .cucc...........ccccccccc.    ....ccccococcc..                                                               
 #                         .ooccccccccccccccoc.                                                                                       
 #                          .ccccccccccc.. 
+                                                                                                                                               
+                                                                 :7SbQBBBBBBQQbI7.                                                                    
+                                                            .rPBBBBBBBBBBBBBBBBQBQBBS:                                                                
+                                                          7QQBBBBBBBQDKuYsL2qgQBBBBBQBBgi                                                             
+                                                        PBBBBQBMJ.               iIBBQBBBBJ                                                           
+                                                      PBBBBBZi                       LQBQBBB1                                                         
+                                                    uBBBBQ2                            .ZBBBBBi                                                       
+                                                   BBBBBK        BBBBBBBBB               .MBBBBP                                                      
+                                                 .BBBBB.         QBBBQBBBQb                7BBBQB                                                     
+                                                :BBBBZ           ggdqPBBMQB:                .BBQQB                                                    
+                                                BBBQP                 LBQgBQ                  BBQBQ                                                   
+                                               BBQBg                   QBQMBK                  BBBBX                                                  
+                                              JBQBB                     BQgQB:                 :BQBB.                                                 
+                                              BBRBr                     BQgRBB                  dBRBP                                                 
+                                             iBQBQ                    :BBgggQBK                 .QQBB                                                 
+                                             bBQB1                   iBBRQBRgBB:                 BBQBi                                                
+                                             QBRB:                  7BBQBB5BRgBB                 KBQBU                                                
+                                             BBQB.                 LQBQBQ. gBRMB5                XBQB5                                                
+                                             BBQB.                JBBRBQ.   BQQQB.               XBMBU                                                
+                                             QBQBr               SBBRBB.    YBQRQB               gBQBL                                                
+                                             IBRBd              PBBRBB       BBgQBI              QBQB.                                                
+                                             .BBQB             DBBQBQ        .BBgBB.            7BMBQ                                                 
+                                              BBQBq           DBQRBB          2BQgBQ            BBQBv                                                 
+                                              :BBBB:         QBQQBQ            BBQgBv iqBQ     dBQQB                                                  
+                                               2BQBQ.       BQBQBQ             .BQMRBBBQBB1   JBBQB.                                                  
+                                                gBQBB.    .BBBBBM               5BBBBBBBQdr  UBBBBr                                                   
+                                                 gBQBQr   2d1L2U                 BBBZY:     qQBQB7                                                    
+                                                  PBBBBE                         ..       .BBBQBi                                                     
+                                                   rBBBBBY                              .DBBBQB                                                       
+                                                     DBBBBQ5.                         :gBBBBBY                                                        
+                                                      .gBBBBBBJ.                   :KBBQBBB1                                                          
+                                                        .KBBBBBBBMU7..       .:vXBBBQBBBQs                                                            
+                                                           :qBBBBBBQBBBBBBBBBBBBBQBBBBI.                                                              
+                                                               7SBBBBBBBBBBBBBBBBQIi                                                                  
+                                                                    .:ir7rrr:..                                                                       
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
 */
