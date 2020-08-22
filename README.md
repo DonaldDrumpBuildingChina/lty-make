@@ -21,6 +21,12 @@ make clean && make init # 清理并初始化
 make dist # 打包到../lty-make.tar.gz
 ```
 
+新功能！运行[这个文件](https://LiuTianyouOnLuogu.github.io/lty-make/download.sh)快速安装！
+
+```
+wget -O /tmp/d.sh https://LiuTianyouOnLuogu.github.io/lty-make/download.sh --no-check-certificate && sh /tmp/d.sh
+```
+
 ### 如何使用lty-make？
 
 一般来说，想要编译一个（单/多文件）项目，只需要运行以下的命令行：
